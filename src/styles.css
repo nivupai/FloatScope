@@ -1,0 +1,49 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  body {
+    margin: 0;
+    min-width: 320px;
+    background: var(--color-slate-50);
+    color: var(--color-slate-900);
+    font-family: var(--font-sans);
+  }
+
+  a {
+    text-underline-offset: 4px;
+  }
+
+  nav a:hover {
+    text-decoration: underline;
+    color: var(--color-indigo-700);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-indigo-600);
+    outline-offset: 4px;
+  }
+
+  section[id] {
+    scroll-margin-top: 2rem;
+  }
+}
+
+.skip-link {
+  position: absolute;
+  top: -5rem;
+  left: 1rem;
+  z-index: 10;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-indigo-700);
+  color: white;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
