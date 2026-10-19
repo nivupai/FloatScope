@@ -1,8 +1,9 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
 import App from '../App'
 
-describe('Milestone 1 application shell', () => {
+describe('application shell', () => {
   it('provides a main landmark, a descriptive heading, and a skip link', () => {
     render(<App />)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
@@ -27,16 +28,26 @@ describe('Milestone 1 application shell', () => {
     }
   })
 
-  it('discloses the explorer placeholder and provides no active numerical controls', () => {
+  it('exposes the interactive explorer and changes the color theme', async () => {
+    const user = userEvent.setup()
     render(<App />)
     const explorer = screen.getByRole('region', { name: 'FP16 Explorer' })
     expect(
-      within(explorer).getByText('Planned · Milestone 2'),
+      within(explorer).getByRole('textbox', {
+        name: 'Decimal / special value',
+      }),
     ).toBeInTheDocument()
-    expect(
-      within(explorer).getByText(/numerical results are not implemented/),
-    ).toBeInTheDocument()
-    expect(within(explorer).queryByRole('button')).not.toBeInTheDocument()
-    expect(within(explorer).queryByRole('textbox')).not.toBeInTheDocument()
+    const theme = screen.getByRole('combobox', { name: 'Color theme' })
+    expect(theme).toHaveValue('system')
+    await user.selectOptions(theme, 'dark')
+    expect(document.querySelector('.app-shell')).toHaveAttribute(
+      'data-theme',
+      'dark',
+    )
+    await user.selectOptions(theme, 'light')
+    expect(document.querySelector('.app-shell')).toHaveAttribute(
+      'data-theme',
+      'light',
+    )
   })
 })
