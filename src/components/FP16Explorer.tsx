@@ -1,50 +1,190 @@
+import { useState } from 'react'
+import { decodeFP16, floatToFP16Bits, fp16BitsToHex } from '../lib/numerics'
+import {
+  formatExactFP16,
+  formatNumber,
+  parseDecimalInput,
+} from '../lib/explorer/presentation'
+import { FP16_PRESETS } from '../lib/explorer/presets'
+import { BitFields } from './BitFields'
+import { ValueBreakdown } from './ValueBreakdown'
+import { PrecisionPanel } from './PrecisionPanel'
+
 export function FP16Explorer() {
+  const [bits, setBits] = useState(0x3e00)
+  const [draft, setDraft] = useState('1.5')
+  const [original, setOriginal] = useState<{
+    text: string
+    value: number
+  } | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const decoded = decodeFP16(bits)
+
+  function selectBits(nextBits: number) {
+    const next = decodeFP16(nextBits)
+    setBits(next.bits)
+    setDraft(formatExactFP16(next.value))
+    setOriginal(null)
+    setError(null)
+  }
+
   return (
     <section
       id="explorer"
       aria-labelledby="explorer-heading"
-      className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+      className="explorer"
     >
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 px-6 py-5 sm:px-8">
-        <h2
-          id="explorer-heading"
-          className="text-xl font-semibold tracking-tight text-slate-950"
-        >
-          FP16 Explorer
-        </h2>
-        <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">
-          Planned · Milestone 2
-        </span>
-      </div>
-      <div className="p-6 sm:p-8">
-        <p className="mb-6 max-w-2xl text-sm leading-6 text-slate-600">
-          A future workspace for inspecting the 16 bits of an IEEE 754 binary16
-          value. The field layout below is a static reference.
-        </p>
-        <dl className="grid gap-3 sm:grid-cols-[1fr_2fr_3fr]">
-          <div className="rounded-xl border border-rose-200 bg-rose-50 p-5">
-            <dt className="font-semibold text-rose-950">Sign</dt>
-            <dd className="mt-2 font-mono text-sm text-rose-900">1 bit</dd>
-          </div>
-          <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-5">
-            <dt className="font-semibold text-indigo-950">Exponent</dt>
-            <dd className="mt-2 font-mono text-sm text-indigo-900">5 bits</dd>
-          </div>
-          <div className="rounded-xl border border-teal-200 bg-teal-50 p-5">
-            <dt className="font-semibold text-teal-950">Fraction</dt>
-            <dd className="mt-2 font-mono text-sm text-teal-900">10 bits</dd>
-          </div>
-        </dl>
-        <div className="mt-6 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-6 py-9 text-center">
-          <p className="font-medium text-slate-800">
-            The foundation is here. Exploration comes next.
-          </p>
-          <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-600">
-            Bit editing, decimal encoding, and numerical results are not
-            implemented in this milestone.
-          </p>
+      <div className="explorer-header">
+        <div>
+          <span className="eyebrow">Interactive workspace</span>
+          <h2 id="explorer-heading">FP16 Explorer</h2>
+        </div>
+        <div className="encoding-badge">
+          <code>{fp16BitsToHex(bits)}</code>
+          <span>{decoded.classification}</span>
         </div>
       </div>
+      <div className="explorer-content">
+        <section className="decimal-panel" aria-labelledby="decimal-heading">
+          <div>
+            <h3 id="decimal-heading">Start with a number</h3>
+            <p className="muted text-small">
+              Convert a binary64 input to binary16, or edit the bits below.
+            </p>
+            <form
+              onSubmit={(event) => {
+                event.preventDefault()
+                const result = parseDecimalInput(draft)
+                if (!result.ok) {
+                  setError(result.error)
+                  return
+                }
+                setBits(floatToFP16Bits(result.value))
+                setOriginal({ text: draft.trim(), value: result.value })
+                setError(null)
+              }}
+            >
+              <label htmlFor="decimal-input">Decimal / special value</label>
+              <div className="input-row">
+                <input
+                  id="decimal-input"
+                  type="text"
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={draft}
+                  aria-invalid={error !== null}
+                  aria-describedby={`decimal-help${error ? ' decimal-error' : ''}`}
+                  onChange={(event) => {
+                    setDraft(event.target.value)
+                    setError(null)
+                  }}
+                />
+                <button className="primary-button" type="submit">
+                  Convert to FP16 <span aria-hidden="true">→</span>
+                </button>
+              </div>
+              <p id="decimal-help" className="muted text-small">
+                Decimal or scientific notation; −0 as <code>-0</code>;{' '}
+                <code>Infinity</code>, <code>-Infinity</code>, or{' '}
+                <code>NaN</code> (case-insensitive). Decimal text is first
+                parsed to JavaScript binary64.
+              </p>
+              {error && (
+                <p id="decimal-error" role="alert" className="input-error">
+                  {error}
+                </p>
+              )}
+            </form>
+          </div>
+          <div className="conversion" aria-label="Quantization comparison">
+            {original ? (
+              <>
+                <span className="eyebrow">Last converted input / binary64</span>
+                <output
+                  aria-live="off"
+                  aria-label="Original input"
+                  className="original-value"
+                >
+                  {original.text}
+                </output>
+                <p className="muted text-small">
+                  Parsed Number: <code>{formatNumber(original.value)}</code>
+                </p>
+                <span className="conversion-arrow" aria-hidden="true">
+                  ↓
+                </span>
+                <span className="eyebrow">Quantized / binary16</span>
+                <output
+                  aria-live="off"
+                  aria-label="Quantized FP16 value"
+                  className="quantized-value"
+                >
+                  {formatExactFP16(decoded.value)}
+                </output>
+                <p className="text-small conversion-result">
+                  {Number.isNaN(original.value)
+                    ? 'Canonical quiet NaN · 0x7e00'
+                    : Object.is(original.value, decoded.value)
+                      ? 'Exactly representable in FP16'
+                      : 'Rounded · nearest, ties to even'}
+                </p>
+              </>
+            ) : (
+              <>
+                <span className="eyebrow">Raw encoding selected</span>
+                <p>Bit edits and presets preserve the exact pattern.</p>
+                <p className="muted text-small">
+                  Convert a decimal to compare the original binary64 input with
+                  its quantized FP16 value.
+                </p>
+              </>
+            )}
+          </div>
+        </section>
+        <BitFields
+          bits={bits}
+          onToggle={(position) => selectBits(bits ^ (1 << position))}
+        />
+        <div className="detail-panels">
+          <ValueBreakdown decoded={decoded} />
+          <PrecisionPanel bits={bits} onSelect={selectBits} />
+        </div>
+        <section className="preset-panel" aria-labelledby="presets-heading">
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">Reference patterns</p>
+              <h3 id="presets-heading">Explore the edge cases</h3>
+            </div>
+            <span className="muted text-small">
+              Explicit, validated 16-bit encodings
+            </span>
+          </div>
+          <div className="presets">
+            {FP16_PRESETS.map((preset) => (
+              <button
+                key={preset.bits}
+                className="preset-button"
+                type="button"
+                aria-pressed={bits === preset.bits}
+                onClick={() => selectBits(preset.bits)}
+              >
+                <span>{preset.label}</span>
+                <code>{fp16BitsToHex(preset.bits)}</code>
+              </button>
+            ))}
+          </div>
+        </section>
+      </div>
+      <p
+        role="status"
+        aria-label="FP16 selection"
+        aria-live="polite"
+        aria-atomic="true"
+        className="explorer-status"
+      >
+        {fp16BitsToHex(bits)} · {decoded.classification} ·{' '}
+        {formatExactFP16(decoded.value)}
+      </p>
     </section>
   )
 }

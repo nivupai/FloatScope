@@ -2,7 +2,7 @@
 
 ## Scope and architecture
 
-- Build incrementally. Milestone 2 adds the binary16 numerical library; keep the existing UI as a clearly labeled placeholder. Interactive exploration and arithmetic operations remain future work.
+- Build incrementally. Milestone 3 provides the interactive FP16 representation Explorer using the tested binary16 engine. Arithmetic operations, transformer attention, and hardware simulation remain future work.
 - Use React, strict TypeScript, Vite, Tailwind CSS, Vitest, ESLint, and Prettier. Prefer native platform APIs and keep dependencies minimal.
 - Put reusable UI in `src/components/`, pure numerical code in `src/lib/numerics/`, and tests in `src/tests/`. Keep numerical models independent of React, the DOM, and display formatting.
 - Favor small components, explicit types, deterministic pure functions, and documented module boundaries. Do not introduce routing or state libraries without a concrete need.
@@ -22,6 +22,11 @@
 - Use semantic landmarks, ordered headings, accessible labels, keyboard navigation, visible focus states, and responsive layouts.
 - Do not communicate a numerical field or state through color alone. Pair visualizations with text explanations and accessible alternatives.
 - Clearly distinguish planned features from working functionality. Avoid controls that imply an unimplemented calculation works.
+- Keep the raw uint16 pattern as the Explorer's source of truth. React components must consume the numerical library rather than duplicate decoding, rounding, adjacency, or ULP logic.
+- Keep decimal text and the last converted binary64 input separate from the selected raw pattern. Raw edits/presets/neighbor selections clear conversion comparisons; invalid submissions retain the current pattern. Document Number parsing and special-value conventions.
+- Display finite FP16 values with exact terminating decimal expansions, preserve visible `-0`, and retain NaN metadata during raw edits. Presentation helpers belong in `src/lib/explorer/`, separate from the numerical engine.
+- Use native buttons with named bit positions and `aria-pressed`, labeled input validation, a single polite selection announcement, and color-independent field labels. Verify interactions with the actual engine; never substitute mock IEEE 754 decoding.
+- Maintain light, dark, and system themes with readable contrast, responsive field layouts, focus indicators, and reduced-motion support. Theme choice is session-local.
 
 ## Validation and workflow
 

@@ -4,11 +4,32 @@ An open-source interactive laboratory for understanding IEEE 754 floating-point 
 
 FloatScope aims to connect bit representations, rounding decisions, and numerical effects through accessible visual explanations and carefully tested models.
 
-## Current scope: Milestone 2
+## Current scope: Milestone 3
 
-The project includes a framework-independent IEEE 754 binary16 numerical engine, built on the Vite, React, TypeScript, Tailwind CSS, Vitest, ESLint, Prettier, and GitHub Actions foundation. The existing application shell is unchanged: its FP16 Explorer remains a clearly labeled UI placeholder.
+FloatScope now includes an interactive FP16 Explorer powered by the framework-independent IEEE 754 binary16 numerical engine. Vite, React, TypeScript, Tailwind CSS, Vitest, ESLint, Prettier, and GitHub Actions provide the foundation.
 
-**Encoding, decoding, and numerical introspection are implemented as a library.** Interactive numerical controls, visualizations, and arithmetic operations remain future work.
+**Representation and bit manipulation are interactive.** Arithmetic operations, transformer attention, and hardware simulation remain future work.
+
+## Using the FP16 Explorer
+
+1. Start the app with the setup commands below. The initial pattern is **1.5 / 0x3e00**.
+2. Toggle any of the sixteen bits by clicking its button, or use **Tab** to focus it and **Space/Enter** to toggle. Sign, exponent, and fraction have distinct colors, visible labels, bit positions, and accessible pressed states.
+3. Enter a decimal or scientific-notation value and select **Convert to FP16** (or press Enter). The comparison shows the entered text, parsed binary64 Number, and the rounded FP16 value separately. Conversion uses nearest, ties-to-even. Incomplete or invalid submissions show an error and preserve the selected pattern.
+4. Read the exact decoded decimal value, classification, raw fields, exponent bias, unbiased exponent, implicit leading bit, hexadecimal encoding, and class-specific mathematical explanation.
+5. Select a reference preset, or step to a previous/next numerical neighbor. The precision panel explains binade ULP, signed zeros, infinities, and unordered NaNs. Neighbor buttons follow numerical order, not unsigned encoding order; both zeros skip the other zero encoding when stepping.
+6. Choose **System**, **Light**, or **Dark** theme in the header. System follows the OS color preference; manual selections last for the current page session. Layouts adapt to mobile widths, and reduced-motion preferences disable transitions.
+
+Accepted input examples: `0.1`, `-0.125`, `.5`, `1.5e0`, `-0`, `Infinity`, `+Infinity`, `-Infinity`, and `NaN`. Special tokens are case-insensitive and surrounding whitespace is ignored. Use ASCII `-` for negative input. Hexadecimal strings, digit separators, malformed numbers, empty input, and decimals outside the finite binary64 range are rejected. Explicit infinity tokens are accepted.
+
+Presets use explicit validated bit patterns for +0, -0, 1.0, 1.5, the smallest/largest positive subnormals, the smallest positive normal, maximum finite positive, positive infinity, and quiet NaN with payload 1 (`0x7e01`). Editing bits, selecting a preset, or stepping to a neighbor clears the last conversion comparison and synchronizes the decimal field with the decoded value. Editing the decimal text alone does not change the selected bits; comparison results are labeled **Last converted input** until another conversion.
+
+### Display and input limitations
+
+- Finite FP16 output uses its exact terminating decimal expansion (up to 24 fractional places), with no display rounding; negative zero is shown as `-0`.
+- Decimal text is first parsed into a JavaScript binary64 Number. Parsing may round, or underflow to signed zero, before FP16 conversion. FloatScope does not parse decimal strings as exact rationals. The original text and parsed Number are shown to make this boundary visible.
+- Raw NaN edits preserve sign, quiet/signaling bit, and payload. Submitting `NaN` canonicalizes to positive quiet NaN `0x7e00`; JavaScript Number cannot retain the original FP16 NaN metadata. Signaling-NaN exceptions and IEEE status flags are not simulated.
+- ULP uses the engine's sign-independent binade-spacing definition, not necessarily the gap to the next greater value. Infinity returns Infinity and NaN returns NaN; neither has a finite ULP. Outward stepping at infinity saturates. NaN neighbor controls are disabled because NaNs are unordered.
+- Browser visual review and screenshots were unavailable for this milestone: browser-connector inventory was empty and computer-use access to Google Chrome was not approved. Layout, theme appearance, focus rendering, and screen-reader announcements have not been verified in a real browser. Automated DOM tests cover the interactions and semantics; manual browser review is still needed.
 
 ## IEEE 754 binary16 (FP16)
 
@@ -83,24 +104,25 @@ src/
   App.tsx                 Application composition and overview
   main.tsx                React entry point
   styles.css              Tailwind import and shared accessible styles
-  components/             Header, FP16 placeholder, and roadmap
+  components/             Explorer, bit fields, breakdown, precision, and shell
+  lib/explorer/           Decimal input, exact display formatting, and presets
   lib/numerics/           Binary16 conversion, introspection, types, and API docs
-  tests/                  Shell tests, numerical tests, and independent oracle
+  tests/                  UI integration, presentation, numerical tests, and oracle
 .github/workflows/ci.yml   Lint, formatting, tests, and production build
 ```
 
-Tests verify the shell plus all 65,536 binary16 patterns, every finite rounding midpoint and its binary64 neighbors on both signs, binary64 exponent extremes, NaN handling, adjacency, and ULP spacing. An independent lattice-search oracle supplements round trips; native FP16 references are compared automatically when available. CI runs lint, formatting, tests, type checking, and production builds on Node 22.9.0 and Node 24 for pushes and pull requests.
+Tests retain all Milestone 2 numerical checks: all 65,536 binary16 patterns, every finite rounding midpoint and its binary64 neighbors on both signs, binary64 exponent extremes, NaN handling, adjacency, and ULP spacing. An independent lattice-search oracle supplements round trips; native FP16 references are compared automatically when available. Explorer integration tests use the actual engine and user-event for bit toggles, keyboard activation, decimal quantization, signed zero, every preset, class transitions, neighbors, invalid input, NaN metadata, and theme selection. Exact decimal display is independently checked against rational integer coordinates for every finite raw pattern. CI runs lint, formatting, tests, type checking, and production builds on Node 22.9.0 and Node 24 for pushes and pull requests.
 
 ## Roadmap
 
 1. **Project foundation** — responsive shell, tooling, tests, docs, and CI (completed).
-2. **Binary16 numerical engine** — encoding, decoding, rounding, and introspection (this milestone). The interactive FP16 Explorer is still planned separately.
-3. **Precision visualizations** — exponent, significand, representable values, and ULP spacing.
+2. **Binary16 numerical engine** — encoding, decoding, rounding, and introspection (completed).
+3. **Interactive FP16 Explorer** — bit editing, decimal quantization, explanations, presets, adjacent values, and ULP (this milestone). Richer number-line visualizations remain future work.
 4. **Arithmetic traces** — step-by-step FP16 addition, multiplication, and rounding.
 5. **Formats and AI experiments** — compare FP16, BF16, and FP32; explore transformer attention numerical precision.
 6. **Optional hardware work** — original open RTL implementations and hardware validation.
 
-Only the foundation and numerical engine are implemented. The remaining stages and interactive Explorer are planned capabilities, not delivery dates.
+The foundation, numerical engine, and representation Explorer are implemented. Later stages are planned capabilities, not delivery dates.
 
 ## Engineering principles
 

@@ -4,32 +4,33 @@ const stages = [
     title: 'Project foundation',
     detail:
       'Application shell, tests, documentation, and continuous integration.',
-    status: 'Current milestone',
+    status: 'Complete',
   },
   {
     number: '02',
-    title: 'Explore binary16',
+    title: 'Binary16 numerical engine',
     detail:
-      'Bit manipulation, decoding, and decimal encoding with ties-to-even rounding.',
-    status: 'Planned',
+      'Exact encoding, decoding, introspection, and ties-to-even rounding.',
+    status: 'Complete',
   },
   {
     number: '03',
-    title: 'See precision',
-    detail: 'Exponent, significand, representable values, and ULP spacing.',
-    status: 'Planned',
+    title: 'Interactive FP16 Explorer',
+    detail:
+      'Bit manipulation, decimal quantization, numerical breakdown, and adjacent values.',
+    status: 'Current milestone',
   },
   {
     number: '04',
     title: 'Trace arithmetic',
-    detail: 'Step-by-step FP16 addition, multiplication, and rounding traces.',
+    detail: 'Future FP16 addition, multiplication, and rounding traces.',
     status: 'Planned',
   },
   {
     number: '05',
     title: 'Compare & experiment',
     detail:
-      'FP16, BF16, FP32, and transformer attention precision experiments.',
+      'Future FP16, BF16, FP32, and transformer attention precision experiments.',
     status: 'Planned',
   },
   {
@@ -42,40 +43,24 @@ const stages = [
 
 export function Roadmap() {
   return (
-    <section id="roadmap" aria-labelledby="roadmap-heading" className="mt-16">
-      <h2
-        id="roadmap-heading"
-        className="text-2xl font-semibold tracking-tight text-slate-950"
-      >
-        A path from bits to behavior
-      </h2>
-      <p className="mt-3 text-slate-600">
+    <section id="roadmap" aria-labelledby="roadmap-heading" className="roadmap">
+      <h2 id="roadmap-heading">A path from bits to behavior</h2>
+      <p className="muted">
         Built incrementally, with numerical correctness at every step.
       </p>
-      <ol className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <ol className="roadmap-grid">
         {stages.map((stage) => (
-          <li
-            key={stage.number}
-            className="rounded-xl border border-slate-200 bg-white p-6"
-          >
-            <div className="flex items-center justify-between gap-3 text-xs">
-              <span aria-hidden="true" className="font-mono text-slate-500">
+          <li key={stage.number} className="roadmap-card">
+            <div className="roadmap-card-heading">
+              <span aria-hidden="true" className="font-mono muted">
                 {stage.number}
               </span>
-              <span
-                className={
-                  stage.number === '01'
-                    ? 'font-semibold text-indigo-700'
-                    : 'text-slate-500'
-                }
-              >
+              <span className={stage.number === '03' ? 'accent-text' : 'muted'}>
                 {stage.status}
               </span>
             </div>
-            <h3 className="mt-5 font-semibold text-slate-950">{stage.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              {stage.detail}
-            </p>
+            <h3>{stage.title}</h3>
+            <p className="muted text-small">{stage.detail}</p>
           </li>
         ))}
       </ol>

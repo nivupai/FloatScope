@@ -1,27 +1,41 @@
-export function Header() {
+export type ColorTheme = 'system' | 'light' | 'dark'
+
+export function Header({
+  theme,
+  onThemeChange,
+}: {
+  theme: ColorTheme
+  onThemeChange: (theme: ColorTheme) => void
+}) {
   return (
-    <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-5 px-6 py-5">
-        <a
-          href="#main"
-          className="flex items-center gap-3 font-bold tracking-tight text-slate-950"
-        >
-          <span
-            aria-hidden="true"
-            className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-700 font-mono text-sm text-white"
-          >
+    <header className="site-header">
+      <div className="page-width header-inner">
+        <a href="#main" className="brand">
+          <span aria-hidden="true" className="brand-mark">
             ƒ
           </span>
-          FloatScope
+          <span>
+            FloatScope<small>THE NUMERICAL LAB</small>
+          </span>
         </a>
-        <nav
-          aria-label="Primary"
-          className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-600"
-        >
+        <nav aria-label="Primary" className="primary-nav">
           <a href="#explorer">FP16 Explorer</a>
           <a href="#roadmap">Roadmap</a>
           <a href="#about">About</a>
         </nav>
+        <label className="theme-picker">
+          <span className="sr-only">Color theme</span>
+          <select
+            value={theme}
+            onChange={(event) =>
+              onThemeChange(event.target.value as ColorTheme)
+            }
+          >
+            <option value="system">System theme</option>
+            <option value="light">Light theme</option>
+            <option value="dark">Dark theme</option>
+          </select>
+        </label>
       </div>
     </header>
   )
