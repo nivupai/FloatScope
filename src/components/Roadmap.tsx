@@ -18,23 +18,30 @@ const stages = [
     title: 'Interactive FP16 Explorer',
     detail:
       'Bit manipulation, decimal quantization, numerical breakdown, and adjacent values.',
-    status: 'Current milestone',
+    status: 'Complete',
   },
   {
     number: '04',
+    title: 'Precision microscope',
+    detail:
+      'Interactive number line, rounding cells, quantization error, and ULP spacing.',
+    status: 'Current milestone',
+  },
+  {
+    number: '05',
     title: 'Trace arithmetic',
     detail: 'Future FP16 addition, multiplication, and rounding traces.',
     status: 'Planned',
   },
   {
-    number: '05',
+    number: '06',
     title: 'Compare & experiment',
     detail:
       'Future FP16, BF16, FP32, and transformer attention precision experiments.',
     status: 'Planned',
   },
   {
-    number: '06',
+    number: '07',
     title: 'Connect to hardware',
     detail: 'Optional open RTL implementations and hardware validation.',
     status: 'Future / optional',
@@ -55,7 +62,7 @@ export function Roadmap() {
               <span aria-hidden="true" className="font-mono muted">
                 {stage.number}
               </span>
-              <span className={stage.number === '03' ? 'accent-text' : 'muted'}>
+              <span className={stage.number === '04' ? 'accent-text' : 'muted'}>
                 {stage.status}
               </span>
             </div>
