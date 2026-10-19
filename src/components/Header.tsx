@@ -21,7 +21,7 @@ export function Header({
         <nav aria-label="Primary" className="primary-nav">
           <a href="#explorer">FP16 Explorer</a>
           <a href="#roadmap">Roadmap</a>
-          <a href="#about">About</a>
+          <a href="#microscope">Microscope</a>
         </nav>
         <label className="theme-picker">
           <span className="sr-only">Color theme</span>

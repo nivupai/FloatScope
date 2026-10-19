@@ -4,11 +4,40 @@ An open-source interactive laboratory for understanding IEEE 754 floating-point 
 
 FloatScope aims to connect bit representations, rounding decisions, and numerical effects through accessible visual explanations and carefully tested models.
 
-## Current scope: Milestone 3
+## Current scope: Milestone 4
 
-FloatScope now includes an interactive FP16 Explorer powered by the framework-independent IEEE 754 binary16 numerical engine. Vite, React, TypeScript, Tailwind CSS, Vitest, ESLint, Prettier, and GitHub Actions provide the foundation.
+FloatScope includes an interactive FP16 Explorer and a **Floating-Point Precision Microscope**, powered by the validated IEEE 754 binary16 engine. The microscope connects discrete representable values, rounding cells, quantization error, and ULP spacing across the number line. Vite, React, TypeScript, Tailwind CSS, Vitest, ESLint, Prettier, and GitHub Actions provide the foundation.
 
-**Representation and bit manipulation are interactive.** Arithmetic operations, transformer attention, and hardware simulation remain future work.
+**Representation, bit manipulation, and precision exploration are interactive.** FP16 arithmetic operations, transformer attention, and hardware simulation remain future work. No plotting dependency was added.
+
+## Using the Precision Microscope
+
+Open **Microscope** in the header, or scroll below the existing Explorer.
+
+1. Enter a decimal/scientific binary64 target and press **Analyze target** or Enter. Input conventions match the Explorer, including `-0`, infinities, and NaN. The last applied text, parsed binary64 Number, quantized FP16 value, neighbors, rounding direction, absolute error, relative error, and selected binary/hex encoding are reported separately.
+2. Use **Zoom in/out**, **Pan left/right**, **Fit target**, and **Overview**. Round markers are actual FP16 values; the cross marks the binary64 target and the diamond its quantized value. Shading shows the selected rounding cell; square endpoints and dashed boundaries distinguish it from discrete points. Tooltips explain exact point values and their ULP spacing.
+3. Choose **Move target** or **Pan viewport** drag mode. The target slider moves between representable values; clicking a point or using **Inspect a visible FP16 point** selects an exact FP16 value. The expandable point table gives exact values, binary, hex, and ULP.
+4. Keyboard users can focus the number line: **Left/Right** pan, **+/−** zoom, and **Up/Down** move the binary64 target by 1% of the current view. Native buttons, the slider, and point/region dropdowns provide text controls for the same exploration.
+5. Try all seven explained experiments: why **1.0001 becomes 1**, spacing near **1** and **1000**, subnormal precision, gradual underflow, exponent boundaries, and maximum finite/overflow behavior.
+6. Inspect the positive **ULP-versus-magnitude** chart. Both axes are logarithmic (base 2). Click a region or use **Inspect spacing region** to focus the local number line on that binade. Negative magnitudes mirror positive spacing.
+
+### Mathematical definitions and examples
+
+- A normal binade `[2**e, 2**(e+1))` has constant absolute spacing `2**(e-10)`. Normal exponent transitions double spacing; subnormals and the first normal binade both have spacing `2**-24`. There is **no spacing jump at the smallest normal**, `2**-14`.
+- A nearest-even rounding cell is bounded by exact midpoints to adjacent FP16 values. Even retained significands own their halfway endpoints; odd ones do not. The cell of 1 is **[0.999755859375, 1.00048828125]**: 1.0001 rounds to 1, and the upper endpoint also rounds to 1 by ties-to-even. Cells at powers of two can be asymmetric.
+- Signed zeros share a geometric point but have sign-dependent half-cells ending at ±`2**-25`. Zero itself is a sign seam, not a halfway tie. Maximum finite FP16 is 65504; the exact overflow tie is 65520, halfway to virtual 65536, which overflows after significand carry. Negative overflow is symmetric.
+- Absolute error is `abs(FP16 - binary64 input)`. Relative error divides that by `abs(input)` and is undefined at zero. Errors for nonfinite original inputs are undefined; finite inputs that overflow FP16 have infinite error. Relative division uses binary64 arithmetic and may round.
+- Constant absolute spacing is different from relative precision: spacing near 1000 is 0.5, versus `2**-10` immediately above 1. Subnormal spacing stays fixed as relative precision deteriorates toward zero. For input magnitudes at least `2**-14` with finite quantization, nearest-rounding relative error is bounded by `2**-11`.
+
+### Microscope limits and validation
+
+The plot domain is ±131072, with viewport widths from `2**-30` to 262144. Analysis still accepts arbitrary binary64 values; extreme or nonfinite targets are explicitly marked off-axis. The finite numerical lattice has **63,487 positions**, combining both zero encodings geometrically. Visible values are located by binary search, and the renderer caps points at **121**. Wide views explicitly disclose sampling: omitted points are still representable. Zoom in to resolve individual gaps. Tooltips report engine ULP, never a misleading gap between sampled markers.
+
+Decimal parsing is binary64-first, not exact decimal-rational conversion. Binary64/error readouts use shortest round-trip strings; FP16 readouts and finite rounding boundaries use exact decimal expansions. Axis labels are rounded to six significant digits, and SVG coordinates are approximate screen projections. The target slider has 1,001 normalized positions; text input remains independent of slider resolution. Charts and tables scroll horizontally on narrow screens while controls/readouts reflow.
+
+Tests retain all 133 earlier checks and add independent-lattice viewport comparisons, exhaustive finite-cell endpoint ownership, ULP region validation, and real-engine DOM integration for every example, errors, ties, special values, keyboard controls, sampling, native selectors, and pointer target/pan mapping. Browser connection inventory was empty during Milestone 4: real-browser layout, pointer capture/touch, native tooltips, focus/theme appearance, and screen-reader behavior remain unverified. No screenshot or successful browser review is claimed.
+
+See the [microscope model, API, mathematics, and validation notes](src/lib/microscope/README.md) for complete definitions and limitations.
 
 ## Using the FP16 Explorer
 
@@ -29,7 +58,7 @@ Presets use explicit validated bit patterns for +0, -0, 1.0, 1.5, the smallest/l
 - Decimal text is first parsed into a JavaScript binary64 Number. Parsing may round, or underflow to signed zero, before FP16 conversion. FloatScope does not parse decimal strings as exact rationals. The original text and parsed Number are shown to make this boundary visible.
 - Raw NaN edits preserve sign, quiet/signaling bit, and payload. Submitting `NaN` canonicalizes to positive quiet NaN `0x7e00`; JavaScript Number cannot retain the original FP16 NaN metadata. Signaling-NaN exceptions and IEEE status flags are not simulated.
 - ULP uses the engine's sign-independent binade-spacing definition, not necessarily the gap to the next greater value. Infinity returns Infinity and NaN returns NaN; neither has a finite ULP. Outward stepping at infinity saturates. NaN neighbor controls are disabled because NaNs are unordered.
-- Browser visual review and screenshots were unavailable for this milestone: browser-connector inventory was empty and computer-use access to Google Chrome was not approved. Layout, theme appearance, focus rendering, and screen-reader announcements have not been verified in a real browser. Automated DOM tests cover the interactions and semantics; manual browser review is still needed.
+- Real-browser visual verification is unavailable in the current environment. Automated DOM tests cover interactions and semantics; manual review of layout, themes, focus rendering, and screen-reader announcements is still needed.
 
 ## IEEE 754 binary16 (FP16)
 
@@ -106,7 +135,10 @@ src/
   styles.css              Tailwind import and shared accessible styles
   components/             Explorer, bit fields, breakdown, precision, and shell
   lib/explorer/           Decimal input, exact display formatting, and presets
+  lib/microscope/         Precision examples, boundary formatting, and model docs
   lib/numerics/           Binary16 conversion, introspection, types, and API docs
+    microscope.ts         Pure lattice, viewport, rounding-cell, error, ULP models
+  components/microscope/  Number line, ULP chart, and microscope composition
   tests/                  UI integration, presentation, numerical tests, and oracle
 .github/workflows/ci.yml   Lint, formatting, tests, and production build
 ```
@@ -117,12 +149,13 @@ Tests retain all Milestone 2 numerical checks: all 65,536 binary16 patterns, eve
 
 1. **Project foundation** — responsive shell, tooling, tests, docs, and CI (completed).
 2. **Binary16 numerical engine** — encoding, decoding, rounding, and introspection (completed).
-3. **Interactive FP16 Explorer** — bit editing, decimal quantization, explanations, presets, adjacent values, and ULP (this milestone). Richer number-line visualizations remain future work.
-4. **Arithmetic traces** — step-by-step FP16 addition, multiplication, and rounding.
-5. **Formats and AI experiments** — compare FP16, BF16, and FP32; explore transformer attention numerical precision.
-6. **Optional hardware work** — original open RTL implementations and hardware validation.
+3. **Interactive FP16 Explorer** — bit editing, decimal quantization, explanations, presets, adjacent values, and ULP (completed).
+4. **Precision Microscope** — interactive number line, rounding cells, error analysis, and ULP/binade exploration (this milestone).
+5. **Arithmetic traces** — future step-by-step FP16 addition, multiplication, and rounding.
+6. **Formats and AI experiments** — future FP16, BF16, FP32, and transformer attention precision experiments.
+7. **Optional hardware work** — original open RTL implementations and hardware validation.
 
-The foundation, numerical engine, and representation Explorer are implemented. Later stages are planned capabilities, not delivery dates.
+The foundation, numerical engine, representation Explorer, and precision microscope are implemented. Later stages are planned capabilities, not delivery dates.
 
 ## Engineering principles
 

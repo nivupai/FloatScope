@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PrecisionMicroscope } from './components/microscope/PrecisionMicroscope'
 import { FP16Explorer } from './components/FP16Explorer'
 import { Header } from './components/Header'
 import type { ColorTheme } from './components/Header'
@@ -26,10 +27,11 @@ export default function App() {
           </div>
           <div className="hero-meta">
             <span className="lab-indicator" aria-hidden="true" />
-            Milestone 3 <span className="muted">/ Representation explorer</span>
+            Milestone 4 <span className="muted">/ Precision microscope</span>
           </div>
         </div>
         <FP16Explorer />
+        <PrecisionMicroscope />
         <Roadmap />
         <section
           id="about"
@@ -47,7 +49,7 @@ export default function App() {
         </section>
       </main>
       <footer className="site-footer">
-        FloatScope · Open source under the MIT License · Milestone 3
+        FloatScope · Open source under the MIT License · Milestone 4
       </footer>
     </div>
   )

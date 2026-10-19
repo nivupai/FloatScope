@@ -2,7 +2,7 @@
 
 ## Scope and architecture
 
-- Build incrementally. Milestone 3 provides the interactive FP16 representation Explorer using the tested binary16 engine. Arithmetic operations, transformer attention, and hardware simulation remain future work.
+- Build incrementally. Milestone 4 adds the precision microscope: viewport-based representable points, nearest-even rounding cells, quantization errors, and ULP binades. FP16 arithmetic operations, transformer attention, and hardware simulation remain future work.
 - Use React, strict TypeScript, Vite, Tailwind CSS, Vitest, ESLint, and Prettier. Prefer native platform APIs and keep dependencies minimal.
 - Put reusable UI in `src/components/`, pure numerical code in `src/lib/numerics/`, and tests in `src/tests/`. Keep numerical models independent of React, the DOM, and display formatting.
 - Favor small components, explicit types, deterministic pure functions, and documented module boundaries. Do not introduce routing or state libraries without a concrete need.
@@ -27,6 +27,10 @@
 - Display finite FP16 values with exact terminating decimal expansions, preserve visible `-0`, and retain NaN metadata during raw edits. Presentation helpers belong in `src/lib/explorer/`, separate from the numerical engine.
 - Use native buttons with named bit positions and `aria-pressed`, labeled input validation, a single polite selection announcement, and color-independent field labels. Verify interactions with the actual engine; never substitute mock IEEE 754 decoding.
 - Maintain light, dark, and system themes with readable contrast, responsive field layouts, focus indicators, and reduced-motion support. Theme choice is session-local.
+- Keep microscope math in `src/lib/numerics/microscope.ts`, presentation/examples in `src/lib/microscope/`, and SVG components in `src/components/microscope/`. Use the existing conversion/adjacency/ULP engine as the source of truth.
+- Generate viewport points by binary search over finite numerical ranks. Never render the complete FP16 lattice; cap rendered points, report omitted-point sampling, and keep sampled positions on actual representable values. A single geometric zero must not erase signed-zero input metadata.
+- Rounding cells must handle exponent-boundary asymmetry, even/odd endpoint ownership, signed-zero half-cells, and the virtual ±65536 overflow neighbor. Do not label zero's sign seam as a halfway tie.
+- Distinguish FP16 points, target, quantized output, and cell boundaries by shape/text as well as color. Supply keyboard/text alternatives to pointer interactions and exact tabular data. Disclose plot limits, rounded axis labels, binary64 decimal parsing, and error-computation precision.
 
 ## Validation and workflow
 

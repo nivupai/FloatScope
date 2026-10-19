@@ -777,3 +777,268 @@
     transition: none !important;
   }
 }
+
+/* Precision microscope: SVG geometry is derived from the numerical model. */
+.microscope {
+  margin-top: 32px;
+}
+.microscope-input {
+  max-width: 780px;
+}
+.microscope-input > label {
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+.microscope-examples h3 {
+  margin-bottom: 12px;
+}
+.microscope-examples .presets {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.microscope-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-block: 12px;
+}
+.microscope-toolbar button,
+.microscope-toolbar select,
+.microscope-target-controls select,
+.ulp-region-picker select {
+  border: 1px solid var(--border);
+  background: var(--subtle);
+  color: var(--text);
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  min-height: 38px;
+}
+.microscope-toolbar button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.microscope-toolbar button:disabled {
+  color: var(--muted);
+  opacity: 0.65;
+}
+.microscope-toolbar label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.75rem;
+}
+.microscope-chart-shell,
+.table-scroll {
+  overflow-x: auto;
+}
+.number-line-chart,
+.ulp-chart {
+  width: 100%;
+  min-width: 640px;
+  height: auto;
+  display: block;
+}
+.number-line-chart {
+  touch-action: none;
+  cursor: crosshair;
+}
+.plot-axis,
+.plot-tick {
+  stroke: var(--muted);
+  stroke-width: 1;
+}
+.plot-grid {
+  stroke: var(--border);
+  stroke-width: 0.6;
+}
+.plot-label {
+  fill: var(--muted);
+  font: 11px var(--font-mono);
+}
+.lattice-point {
+  cursor: pointer;
+  fill: var(--fraction);
+}
+.lattice-point:hover {
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+.rounding-cell {
+  fill: var(--accent-bg);
+}
+.halfway-line {
+  stroke: var(--accent);
+  stroke-dasharray: 4 3;
+}
+.cell-endpoint {
+  stroke: var(--accent);
+  fill: var(--surface);
+  stroke-width: 1.5;
+}
+.cell-endpoint.included {
+  fill: var(--accent);
+}
+.target-marker {
+  stroke: var(--sign);
+  fill: var(--sign);
+  stroke-width: 2;
+}
+.target-marker line {
+  stroke-dasharray: 3 4;
+}
+.target-marker text,
+.quantized-marker text {
+  stroke: none;
+  font: 12px var(--font-mono);
+}
+.quantized-marker {
+  fill: var(--exponent);
+  stroke: var(--exponent);
+  stroke-width: 1.5;
+}
+.plot-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  font-size: 0.7rem;
+  margin-bottom: 12px;
+  color: var(--muted);
+}
+.microscope-target-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 18px;
+}
+.microscope-target-controls label,
+.ulp-region-picker {
+  display: grid;
+  gap: 8px;
+  font-size: 0.8rem;
+  min-width: 0;
+}
+.microscope-target-controls select,
+.ulp-region-picker select {
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+}
+.microscope-target-controls input {
+  accent-color: var(--accent);
+  width: 100%;
+  min-height: 38px;
+}
+.microscope-data {
+  margin-top: 18px;
+  font-size: 0.78rem;
+}
+.microscope-data summary {
+  color: var(--accent);
+  cursor: pointer;
+}
+.microscope-data table {
+  border-collapse: collapse;
+  width: 100%;
+  font: 0.7rem var(--font-mono);
+  margin-top: 12px;
+}
+.microscope-data th,
+.microscope-data td {
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+.microscope-data caption {
+  text-align: left;
+  font: 0.75rem var(--font-sans);
+  margin-block: 10px;
+  color: var(--muted);
+}
+.microscope-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-block: 20px;
+}
+.microscope-metrics > div {
+  background: var(--subtle);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 14px;
+  min-width: 0;
+}
+.microscope-metrics dt,
+.microscope-encoding dt {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+.microscope-metrics dd,
+.microscope-encoding dd {
+  font-size: 0.82rem;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+.microscope-encoding {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+}
+.microscope-tie {
+  color: var(--accent);
+  font-weight: 650;
+  margin-top: 12px;
+}
+.microscope-analysis .explanation {
+  margin-block: 18px;
+  overflow-wrap: anywhere;
+}
+.ulp-region rect {
+  fill: transparent;
+  cursor: pointer;
+}
+.ulp-region:hover rect,
+.ulp-region.selected rect {
+  fill: var(--accent-bg);
+}
+.ulp-step {
+  stroke: var(--fraction);
+  stroke-width: 2.5;
+  pointer-events: none;
+}
+.magnitude-marker {
+  stroke: var(--sign);
+  stroke-dasharray: 4 4;
+  pointer-events: none;
+}
+.ulp-region-picker {
+  max-width: 520px;
+  margin-block: 16px;
+}
+.microscope-explanation-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  font-size: 0.82rem;
+  margin-bottom: 16px;
+}
+@media (max-width: 760px) {
+  .microscope-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+  .microscope-examples .presets {
+    grid-template-columns: 1fr 1fr;
+  }
+  .microscope-target-controls,
+  .microscope-explanation-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .number-line-chart *,
+  .ulp-chart * {
+    transition: none !important;
+  }
+}
