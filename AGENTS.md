@@ -2,7 +2,7 @@
 
 ## Scope and architecture
 
-- Build incrementally. Milestone 1 is infrastructure and a clearly labeled placeholder only; do not implement arithmetic until a later milestone requests it.
+- Build incrementally. Milestone 2 adds the binary16 numerical library; keep the existing UI as a clearly labeled placeholder. Interactive exploration and arithmetic operations remain future work.
 - Use React, strict TypeScript, Vite, Tailwind CSS, Vitest, ESLint, and Prettier. Prefer native platform APIs and keep dependencies minimal.
 - Put reusable UI in `src/components/`, pure numerical code in `src/lib/numerics/`, and tests in `src/tests/`. Keep numerical models independent of React, the DOM, and display formatting.
 - Favor small components, explicit types, deterministic pure functions, and documented module boundaries. Do not introduce routing or state libraries without a concrete need.
@@ -10,10 +10,12 @@
 ## Numerical correctness
 
 - Test IEEE 754 behavior carefully. Never silently approximate edge cases. Disclose any approximation, unsupported case, or deviation in the API documentation and visible UI where relevant.
-- For future binary16 implementations, cover positive and negative zero, subnormals, normal boundaries, infinities, NaNs, underflow, overflow, cancellation, and round-to-nearest, ties-to-even (including exact halfway cases and carry propagation).
+- For binary16 code, cover positive and negative zero, subnormals, normal boundaries, infinities, NaNs, underflow, overflow, and round-to-nearest, ties-to-even (including exact halfway cases and carry propagation). Test cancellation when arithmetic operations are introduced.
 - Use independently derived expected bit patterns and public authoritative references. Exhaustively verify all 65,536 binary16 bit patterns where practical; do not validate an encoder only against its paired decoder.
 - JavaScript `number` uses binary64. Do not assume it reproduces binary16 rounding or arithmetic. Preserve signed zero and explicitly specify NaN payload/canonicalization policy.
-- Keep exact representation, rounding policy, and educational display formatting separate. No arithmetic functionality is implemented in Milestone 1.
+- Keep exact representation, rounding policy, and educational display formatting separate. The numerical library provides conversion and introspection, not binary16 arithmetic operations.
+- All raw-pattern APIs validate uint16 inputs rather than silently masking. Preserve raw NaN metadata in `decodeFP16`; encoding a Number NaN canonicalizes to positive quiet NaN `0x7e00`.
+- Adjacent-value APIs accept and return raw patterns. ULP means sign-independent binade spacing; see `src/lib/numerics/README.md` for zero, boundary, infinity, and NaN semantics.
 
 ## Accessibility and interface
 
