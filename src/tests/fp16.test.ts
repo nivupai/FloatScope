@@ -1,4 +1,6 @@
 // @vitest-environment node
+/// <reference types="node" />
+import { strictEqual } from 'node:assert'
 import { describe, expect, it } from 'vitest'
 import {
   decodeFP16,
@@ -254,15 +256,22 @@ describe('exhaustive binary16 validation', () => {
               : magnitude === 0x7c00
                 ? 'infinity'
                 : 'nan'
-      expect(decoded.value).toBe(expectedValue)
-      expect(decoded.classification).toBe(expectedClassification)
-      expect(decoded.exponent).toBe(Math.floor(magnitude / 1024))
-      expect(decoded.fraction).toBe(magnitude % 1024)
-      expect(floatToFP16Bits(decoded.value)).toBe(
+      // Avoid 393,216 Chai expectation wrappers in this exhaustive Node-only loop.
+      // strictEqual uses Object.is too, preserving NaN equality and signed zero.
+      const context = `FP16 pattern 0x${bits.toString(16).padStart(4, '0')}`
+      strictEqual(decoded.value, expectedValue, context)
+      strictEqual(decoded.classification, expectedClassification, context)
+      strictEqual(decoded.exponent, Math.floor(magnitude / 1024), context)
+      strictEqual(decoded.fraction, magnitude % 1024, context)
+      strictEqual(
+        floatToFP16Bits(decoded.value),
         magnitude > 0x7c00 ? 0x7e00 : bits,
+        context,
       )
-      expect(isExactlyRepresentableFP16(decoded.value)).toBe(
+      strictEqual(
+        isExactlyRepresentableFP16(decoded.value),
         magnitude <= 0x7c00,
+        context,
       )
       counts[decoded.classification] += 1
     }
