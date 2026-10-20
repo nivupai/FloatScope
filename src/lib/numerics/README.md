@@ -58,7 +58,7 @@ DataView extracts the input's binary64 sign, exponent, and fraction. A BigInt si
 
 There is exactly one rounding to binary16, with no binary32 conversion, logarithmic exponent estimation, or approximate epsilon comparison. Magnitudes at or above 65520 round to infinity. A magnitude of exactly `2**-25` rounds to signed zero, since the zero significand is even.
 
-The input is the Number already supplied by JavaScript. Parsing decimal strings to exact rationals is outside this milestone; a decimal literal may already have been rounded to binary64 before calling the API. No binary16 arithmetic, alternative rounding modes, exception flags, or signaling-NaN execution is implemented. Raw-bit NaN inspection is lossless; Number conversion canonicalizes NaNs as described above.
+The input is the Number already supplied by JavaScript. Parsing decimal strings to exact rationals is outside this milestone; a decimal literal may already have been rounded to binary64 before calling the API. These conversion/introspection APIs do not execute arithmetic or expose exception flags. Milestone 5 adds a separate [binary16 add/sub model](../arithmetic/README.md) with explicit NaN execution and per-operation indicators; alternative rounding modes remain unsupported. Raw-bit NaN inspection is lossless; Number conversion canonicalizes NaNs as described above.
 
 ## Validation
 
