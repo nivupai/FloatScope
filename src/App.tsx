@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ArithmeticExplorer } from './components/arithmetic/ArithmeticExplorer'
 import { PrecisionMicroscope } from './components/microscope/PrecisionMicroscope'
 import { FP16Explorer } from './components/FP16Explorer'
 import { Header } from './components/Header'
@@ -27,11 +28,12 @@ export default function App() {
           </div>
           <div className="hero-meta">
             <span className="lab-indicator" aria-hidden="true" />
-            Milestone 4 <span className="muted">/ Precision microscope</span>
+            Milestone 5 <span className="muted">/ Arithmetic explorer</span>
           </div>
         </div>
         <FP16Explorer />
         <PrecisionMicroscope />
+        <ArithmeticExplorer />
         <Roadmap />
         <section
           id="about"
@@ -42,14 +44,14 @@ export default function App() {
           <p className="muted">
             FloatScope connects numerical representations to their consequences
             through accessible, testable experiments. Explore IEEE 754
-            representation today; arithmetic traces and AI accelerator precision
-            experiments are planned future work. All work uses public standards
-            and original, open-source implementations.
+            representation, precision, and exact addition/subtraction traces. AI
+            accelerator precision experiments are planned future work. All work
+            uses public standards and original, open-source implementations.
           </p>
         </section>
       </main>
       <footer className="site-footer">
-        FloatScope · Open source under the MIT License · Milestone 4
+        FloatScope · Open source under the MIT License · Milestone 5
       </footer>
     </div>
   )

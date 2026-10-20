@@ -20,8 +20,8 @@ export function Header({
         </a>
         <nav aria-label="Primary" className="primary-nav">
           <a href="#explorer">FP16 Explorer</a>
-          <a href="#roadmap">Roadmap</a>
           <a href="#microscope">Microscope</a>
+          <a href="#arithmetic">Arithmetic</a>
         </nav>
         <label className="theme-picker">
           <span className="sr-only">Color theme</span>
