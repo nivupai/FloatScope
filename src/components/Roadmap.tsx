@@ -25,13 +25,14 @@ const stages = [
     title: 'Precision microscope',
     detail:
       'Interactive number line, rounding cells, quantization error, and ULP spacing.',
-    status: 'Current milestone',
+    status: 'Complete',
   },
   {
     number: '05',
     title: 'Trace arithmetic',
-    detail: 'Future FP16 addition, multiplication, and rounding traces.',
-    status: 'Planned',
+    detail:
+      'Exact FP16 addition/subtraction, alignment, normalization, rounding, and exception traces. Multiplication is future work.',
+    status: 'Current milestone',
   },
   {
     number: '06',
@@ -62,7 +63,7 @@ export function Roadmap() {
               <span aria-hidden="true" className="font-mono muted">
                 {stage.number}
               </span>
-              <span className={stage.number === '04' ? 'accent-text' : 'muted'}>
+              <span className={stage.number === '05' ? 'accent-text' : 'muted'}>
                 {stage.status}
               </span>
             </div>
