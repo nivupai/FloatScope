@@ -97,6 +97,6 @@ export const ARITHMETIC_EXAMPLES: readonly ArithmeticExample[] = [
     operation: 'add',
     expected: 0x7e01,
     explanation:
-      'Signaling NaN payload 1 is quieted, preserves sign and payload, and sets invalid. The deterministic payload-selection rule is a FloatScope policy, not a mandated universal hardware choice.',
+      'Signaling NaN payload 1 is quieted, preserves sign and payload, and sets invalid. The deterministic payload-selection rule is an FP Play policy, not a mandated universal hardware choice.',
   },
 ]

@@ -1,12 +1,12 @@
-# FloatScope
+# FP Play
 
 An open-source interactive laboratory for understanding IEEE 754 floating-point arithmetic and numerical precision in AI accelerators.
 
-FloatScope aims to connect bit representations, rounding decisions, and numerical effects through accessible visual explanations and carefully tested models.
+FP Play aims to connect bit representations, rounding decisions, and numerical effects through accessible visual explanations and carefully tested models.
 
 ## Current scope: Milestone 5
 
-FloatScope includes an interactive FP16 Explorer, a **Floating-Point Precision Microscope**, and an **Arithmetic Pipeline Explorer**, powered by the validated binary16 numerical models. The microscope connects discrete representable values, rounding cells, quantization error, and ULP spacing across the number line. Vite, React, TypeScript, Tailwind CSS, Vitest, ESLint, Prettier, and GitHub Actions provide the foundation.
+FP Play includes an interactive FP16 Explorer, a **Floating-Point Precision Microscope**, and an **Arithmetic Pipeline Explorer**, powered by the validated binary16 numerical models. The microscope connects discrete representable values, rounding cells, quantization error, and ULP spacing across the number line. Vite, React, TypeScript, Tailwind CSS, Vitest, ESLint, Prettier, and GitHub Actions provide the foundation.
 
 **Representation, precision exploration, and FP16 addition/subtraction traces are interactive.** The new Arithmetic Explorer uses exact dyadic arithmetic, one nearest-even rounding, and computation-derived stages. Multiplication, FMA, division, transformer attention, and hardware simulation remain future work. No application dependencies were added.
 
@@ -96,7 +96,7 @@ Presets use explicit validated bit patterns for +0, -0, 1.0, 1.5, the smallest/l
 ### Display and input limitations
 
 - Finite FP16 output uses its exact terminating decimal expansion (up to 24 fractional places), with no display rounding; negative zero is shown as `-0`.
-- Decimal text is first parsed into a JavaScript binary64 Number. Parsing may round, or underflow to signed zero, before FP16 conversion. FloatScope does not parse decimal strings as exact rationals. The original text and parsed Number are shown to make this boundary visible.
+- Decimal text is first parsed into a JavaScript binary64 Number. Parsing may round, or underflow to signed zero, before FP16 conversion. FP Play does not parse decimal strings as exact rationals. The original text and parsed Number are shown to make this boundary visible.
 - Raw NaN edits preserve sign, quiet/signaling bit, and payload. Submitting `NaN` canonicalizes to positive quiet NaN `0x7e00`; JavaScript Number cannot retain the original FP16 NaN metadata. The representation Explorer does not execute signaling NaNs or report conversion exception flags; the Arithmetic Explorer separately models add/sub indicators.
 - ULP uses the engine's sign-independent binade-spacing definition, not necessarily the gap to the next greater value. Infinity returns Infinity and NaN returns NaN; neither has a finite ULP. Outward stepping at infinity saturates. NaN neighbor controls are disabled because NaNs are unordered.
 - Real-browser visual verification is unavailable in the current environment. Automated DOM tests cover interactions and semantics; manual review of layout, themes, focus rendering, and screen-reader announcements is still needed.
@@ -209,4 +209,4 @@ Visualizations must work with keyboard navigation, visible focus, readable text,
 
 ## License
 
-[MIT](LICENSE) © 2026 FloatScope contributors.
+[MIT](LICENSE) © 2026 contributors. See the license for original attribution.

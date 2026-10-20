@@ -7,7 +7,7 @@ describe('application shell', () => {
   it('provides a main landmark, a descriptive heading, and a skip link', () => {
     render(<App />)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'FloatScope',
+      'FP Play',
     )
     const main = screen.getByRole('main')
     expect(

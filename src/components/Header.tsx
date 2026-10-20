@@ -15,7 +15,7 @@ export function Header({
             ƒ
           </span>
           <span>
-            FloatScope<small>THE NUMERICAL LAB</small>
+            FP Play<small>THE NUMERICAL LAB</small>
           </span>
         </a>
         <nav aria-label="Primary" className="primary-nav">
