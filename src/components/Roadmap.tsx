@@ -31,18 +31,25 @@ const stages = [
     number: '05',
     title: 'Trace arithmetic',
     detail:
-      'Exact FP16 addition/subtraction, alignment, normalization, rounding, and exception traces. Multiplication is future work.',
-    status: 'Current milestone',
+      'Exact FP16 addition/subtraction, alignment, normalization, rounding, and exception traces.',
+    status: 'Complete',
   },
   {
     number: '06',
+    title: 'Multiply & fuse',
+    detail:
+      'Exact FP16 multiplication, single-rounding FMA, and nonfused comparison with verified counterexamples.',
+    status: 'Current milestone',
+  },
+  {
+    number: '07',
     title: 'Compare & experiment',
     detail:
       'Future FP16, BF16, FP32, and transformer attention precision experiments.',
     status: 'Planned',
   },
   {
-    number: '07',
+    number: '08',
     title: 'Connect to hardware',
     detail: 'Optional open RTL implementations and hardware validation.',
     status: 'Future / optional',
@@ -63,7 +70,7 @@ export function Roadmap() {
               <span aria-hidden="true" className="font-mono muted">
                 {stage.number}
               </span>
-              <span className={stage.number === '05' ? 'accent-text' : 'muted'}>
+              <span className={stage.number === '06' ? 'accent-text' : 'muted'}>
                 {stage.status}
               </span>
             </div>
