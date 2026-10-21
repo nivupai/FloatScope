@@ -36,7 +36,7 @@ export function FP16Explorer() {
     >
       <div className="explorer-header">
         <div>
-          <span className="eyebrow">Interactive workspace</span>
+          <span className="eyebrow">01 / Bit Explorer</span>
           <h2 id="explorer-heading">FP16 Explorer</h2>
         </div>
         <div className="encoding-badge">

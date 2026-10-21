@@ -39,17 +39,24 @@ const stages = [
     title: 'Multiply & fuse',
     detail:
       'Exact FP16 multiplication, single-rounding FMA, and nonfused comparison with verified counterexamples.',
-    status: 'Current milestone',
+    status: 'Complete',
   },
   {
     number: '07',
+    title: 'Public release preparation',
+    detail:
+      'Polished entry points, keyboard access, release documentation, and manual Pages readiness for v0.1.0.',
+    status: 'Current milestone',
+  },
+  {
+    number: '08',
     title: 'Compare & experiment',
     detail:
       'Future FP16, BF16, FP32, and transformer attention precision experiments.',
     status: 'Planned',
   },
   {
-    number: '08',
+    number: '09',
     title: 'Connect to hardware',
     detail: 'Optional open RTL implementations and hardware validation.',
     status: 'Future / optional',
@@ -70,7 +77,7 @@ export function Roadmap() {
               <span aria-hidden="true" className="font-mono muted">
                 {stage.number}
               </span>
-              <span className={stage.number === '06' ? 'accent-text' : 'muted'}>
+              <span className={stage.number === '07' ? 'accent-text' : 'muted'}>
                 {stage.status}
               </span>
             </div>

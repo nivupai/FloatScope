@@ -4,6 +4,7 @@ import { PrecisionMicroscope } from './components/microscope/PrecisionMicroscope
 import { FP16Explorer } from './components/FP16Explorer'
 import { Header } from './components/Header'
 import type { ColorTheme } from './components/Header'
+import { Landing } from './components/Landing'
 import { Roadmap } from './components/Roadmap'
 
 export default function App() {
@@ -15,22 +16,7 @@ export default function App() {
       </a>
       <Header theme={theme} onThemeChange={setTheme} />
       <main id="main" tabIndex={-1} className="page-width main-content">
-        <div className="hero">
-          <div>
-            <p className="eyebrow">IEEE 754 / BINARY16 / INTERACTIVE LAB</p>
-            <h1>
-              FP Play<span className="hero-dot">.</span>
-            </h1>
-            <p className="hero-description">
-              Small bits. Big implications. Explore how sixteen bits represent a
-              number.
-            </p>
-          </div>
-          <div className="hero-meta">
-            <span className="lab-indicator" aria-hidden="true" />
-            Milestone 6 <span className="muted">/ Multiplication & fusion</span>
-          </div>
-        </div>
+        <Landing />
         <FP16Explorer />
         <PrecisionMicroscope />
         <ArithmeticExplorer />
@@ -52,7 +38,12 @@ export default function App() {
         </section>
       </main>
       <footer className="site-footer">
-        FP Play · Open source under the MIT License · Milestone 6
+        <span>FP Play · v0.1.0</span>
+        <a href="https://github.com/nivupai/fp-play">Source on GitHub</a>
+        <a href="https://github.com/nivupai/fp-play/blob/main/LICENSE">
+          MIT License
+        </a>
+        <a href="#main">Back to top ↑</a>
       </footer>
     </div>
   )

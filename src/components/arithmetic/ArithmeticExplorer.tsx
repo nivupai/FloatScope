@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Encoding } from './Encoding'
 import { FMAComparison } from './FMAComparison'
 import {
@@ -21,29 +21,87 @@ import {
 type ExplorerOperation = FP16Operation | 'multiply' | 'fma'
 type OperandDraft = { text: string; mode: 'decimal' | 'hex' }
 
+// A hash link opens an existing, independently verified example; no new numerical path.
+const FMA_START_INDEX = 8
+const fmaStart = MULTIPLY_EXAMPLES[FMA_START_INDEX]
+function rawSelection(index: number) {
+  const entry = MULTIPLY_EXAMPLES[index]
+  return {
+    a: entry.a,
+    b: entry.b,
+    c: entry.c ?? 0,
+    operation: entry.operation as ExplorerOperation,
+    sources: [entry.a, entry.b, entry.c ?? 0].map(
+      (bits) => `Raw ${fp16BitsToHex(bits)}`,
+    ),
+  }
+}
+function rawDrafts(index: number): OperandDraft[] {
+  const entry = MULTIPLY_EXAMPLES[index]
+  return [entry.a, entry.b, entry.c ?? 0].map((bits) => ({
+    text: fp16BitsToHex(bits),
+    mode: 'hex',
+  }))
+}
+
 export function ArithmeticExplorer() {
-  const [drafts, setDrafts] = useState<OperandDraft[]>([
-    { text: '1', mode: 'decimal' },
-    { text: '0.5', mode: 'decimal' },
-    { text: '0', mode: 'decimal' },
-  ])
-  const [operation, setOperation] = useState<ExplorerOperation>('add')
-  const [active, setActive] = useState({
-    a: 0x3c00,
-    b: 0x3800,
-    c: 0,
-    operation: 'add' as ExplorerOperation,
-    sources: [
-      'Entered 1; binary64 1',
-      'Entered 0.5; binary64 0.5',
-      'Entered 0; binary64 0',
-    ],
-  })
+  const [initialFma] = useState(
+    () => typeof window !== 'undefined' && window.location.hash === '#fma',
+  )
+  const [drafts, setDrafts] = useState<OperandDraft[]>(() =>
+    initialFma
+      ? rawDrafts(FMA_START_INDEX)
+      : [
+          { text: '1', mode: 'decimal' },
+          { text: '0.5', mode: 'decimal' },
+          { text: '0', mode: 'decimal' },
+        ],
+  )
+  const [operation, setOperation] = useState<ExplorerOperation>(
+    initialFma ? fmaStart.operation : 'add',
+  )
+  const [active, setActive] = useState(() =>
+    initialFma
+      ? rawSelection(FMA_START_INDEX)
+      : {
+          a: 0x3c00,
+          b: 0x3800,
+          c: 0,
+          operation: 'add' as ExplorerOperation,
+          sources: [
+            'Entered 1; binary64 1',
+            'Entered 0.5; binary64 0.5',
+            'Entered 0; binary64 0',
+          ],
+        },
+  )
   const [errors, setErrors] = useState<(string | null)[]>([null, null, null])
-  const [example, setExample] = useState<number | null>(0)
+  const [example, setExample] = useState<number | null>(initialFma ? null : 0)
   const [step, setStep] = useState(0)
-  const [multiplyExample, setMultiplyExample] = useState<number | null>(null)
+  const [multiplyExample, setMultiplyExample] = useState<number | null>(
+    initialFma ? FMA_START_INDEX : null,
+  )
   const [tracePath, setTracePath] = useState('fused')
+  const selectMultiplyExample = useCallback((index: number) => {
+    setActive(rawSelection(index))
+    setDrafts(rawDrafts(index))
+    setOperation(MULTIPLY_EXAMPLES[index].operation)
+    setStep(0)
+    setErrors([null, null, null])
+    setExample(null)
+    setMultiplyExample(index)
+    setTracePath('fused')
+  }, [])
+  useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#fma')
+        selectMultiplyExample(FMA_START_INDEX)
+    }
+    window.addEventListener('hashchange', handleHash)
+    if (initialFma)
+      document.getElementById('fma')?.scrollIntoView?.({ block: 'start' })
+    return () => window.removeEventListener('hashchange', handleHash)
+  }, [initialFma, selectMultiplyExample])
   const comparison =
     active.operation === 'fma'
       ? compareMultiplyAddFP16(active.a, active.b, active.c)
@@ -287,32 +345,58 @@ export function ArithmeticExplorer() {
           finite operands share the 2⁻²⁴ grid, so subnormal sums are exact.
           Decimal input conversion flags are not included.
         </p>
-        {comparison && (
-          <>
-            <FMAComparison comparison={comparison} />
-            <label className="arithmetic-trace-picker">
-              Inspect computation path
-              <select
-                aria-label="Trace path"
-                value={tracePath}
-                onChange={(event) => {
-                  setTracePath(event.target.value)
-                  setStep(0)
-                }}
+        <section
+          id="fma"
+          className="fma-entry"
+          aria-label="FMA Comparison"
+          tabIndex={-1}
+        >
+          {comparison ? (
+            <>
+              <FMAComparison comparison={comparison} />
+              <label className="arithmetic-trace-picker">
+                Inspect computation path
+                <select
+                  aria-label="Trace path"
+                  value={tracePath}
+                  onChange={(event) => {
+                    setTracePath(event.target.value)
+                    setStep(0)
+                  }}
+                >
+                  <option value="fused">
+                    Fused: exact product + C, one rounding
+                  </option>
+                  <option value="product">
+                    Nonfused: rounded multiplication
+                  </option>
+                  <option value="addition">
+                    Nonfused: addition after rounded product
+                  </option>
+                </select>
+              </label>
+            </>
+          ) : (
+            <div className="panel fma-introduction">
+              <div>
+                <p className="eyebrow">ONE ROUNDING / TWO ROUNDED OPERATIONS</p>
+                <h3>FMA Comparison</h3>
+                <p className="muted">
+                  Can a rounded product hide a small result? Compare fused and
+                  nonfused arithmetic with the same FP16 operands and inspect
+                  both paths.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="primary-button"
+                onClick={() => selectMultiplyExample(FMA_START_INDEX)}
               >
-                <option value="fused">
-                  Fused: exact product + C, one rounding
-                </option>
-                <option value="product">
-                  Nonfused: rounded multiplication
-                </option>
-                <option value="addition">
-                  Nonfused: addition after rounded product
-                </option>
-              </select>
-            </label>
-          </>
-        )}
+                Start FMA comparison
+              </button>
+            </div>
+          )}
+        </section>
         <ArithmeticTrace trace={trace} step={step} setStep={setStep} />
         <section aria-labelledby="arithmetic-examples-heading">
           <h3 id="arithmetic-examples-heading">Arithmetic experiments</h3>
@@ -371,29 +455,7 @@ export function ArithmeticExplorer() {
                 type="button"
                 className="preset-button"
                 aria-pressed={multiplyExample === index}
-                onClick={() => {
-                  setActive({
-                    a: entry.a,
-                    b: entry.b,
-                    c: entry.c ?? 0,
-                    operation: entry.operation,
-                    sources: [entry.a, entry.b, entry.c ?? 0].map(
-                      (bits) => `Raw ${fp16BitsToHex(bits)}`,
-                    ),
-                  })
-                  setDrafts(
-                    [entry.a, entry.b, entry.c ?? 0].map((bits) => ({
-                      text: fp16BitsToHex(bits),
-                      mode: 'hex',
-                    })),
-                  )
-                  setOperation(entry.operation)
-                  setStep(0)
-                  setErrors([null, null, null])
-                  setExample(null)
-                  setMultiplyExample(index)
-                  setTracePath('fused')
-                }}
+                onClick={() => selectMultiplyExample(index)}
               >
                 {entry.label}
                 <small className="font-mono">
