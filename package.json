@@ -18,7 +18,9 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run lint && npm run format:check && npm test && npm run build"
+    "check": "npm run lint && npm run format:check && npm run check:contrast && npm test && npm run build",
+    "check:release": "node scripts/check-release.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs"
   },
   "dependencies": {
     "react": "19.3.1",
