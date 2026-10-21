@@ -206,6 +206,10 @@ export function describeStage(stage: ArithmeticStage): {
             stage.finalSignificand.toString(2).padStart(11, '0'),
           ],
           ['Final working exponent', String(stage.finalExponent)],
+          [
+            'Tiny after precision-only rounding',
+            String(stage.tinyAfterPrecisionRounding),
+          ],
         ],
       }
     case 'special':
@@ -228,7 +232,7 @@ export function describeStage(stage: ArithmeticStage): {
     case 'encode':
       return {
         explanation:
-          'Pack the final sign, exponent, and fraction, or encode the special result. Flags are per-operation, not sticky global processor state. Underflow requires both tininess after rounding and inexactness.',
+          'Pack the final sign, exponent, and fraction, or encode the special result. Flags are per-operation, not sticky global processor state. Underflow requires both tininess after eleven-bit precision rounding with unbounded exponents and final inexactness; it cannot be inferred solely from the stored exponent.',
         rows: [
           ['Result binary', formatFP16Bits(stage.bits)],
           ['Result hex', fp16BitsToHex(stage.bits)],

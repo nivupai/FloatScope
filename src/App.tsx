@@ -28,7 +28,7 @@ export default function App() {
           </div>
           <div className="hero-meta">
             <span className="lab-indicator" aria-hidden="true" />
-            Milestone 5 <span className="muted">/ Arithmetic explorer</span>
+            Milestone 6 <span className="muted">/ Multiplication & fusion</span>
           </div>
         </div>
         <FP16Explorer />
@@ -44,14 +44,15 @@ export default function App() {
           <p className="muted">
             FP Play connects numerical representations to their consequences
             through accessible, testable experiments. Explore IEEE 754
-            representation, precision, and exact addition/subtraction traces. AI
-            accelerator precision experiments are planned future work. All work
-            uses public standards and original, open-source implementations.
+            representation, precision, and exact add/subtract/multiply/FMA
+            traces. AI accelerator precision experiments are planned future
+            work. All work uses public standards and original, open-source
+            implementations.
           </p>
         </section>
       </main>
       <footer className="site-footer">
-        FP Play · Open source under the MIT License · Milestone 5
+        FP Play · Open source under the MIT License · Milestone 6
       </footer>
     </div>
   )

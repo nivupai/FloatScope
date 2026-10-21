@@ -1296,3 +1296,78 @@
     transition: none;
   }
 }
+
+/* Single-rounding versus two-operation comparison, using shared field colors. */
+.fusion-results {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-block: 16px;
+}
+.fusion-results h4 {
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+.fusion-results .panel {
+  padding: 16px;
+}
+.fusion-results .arithmetic-value {
+  font-size: 1.1rem;
+}
+.fusion-comparison > p {
+  overflow-wrap: anywhere;
+}
+.fusion-flags {
+  display: grid;
+  gap: 5px;
+  margin-top: 12px;
+  font-size: 0.72rem;
+}
+.fusion-flags > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.fusion-flags dd {
+  font-weight: 650;
+}
+.arithmetic-trace-picker {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+.arithmetic-trace-picker select {
+  min-width: 0;
+  width: 100%;
+  padding: 10px;
+  background: var(--subtle);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-weight: 400;
+}
+@media (max-width: 1000px) {
+  .fusion-results {
+    grid-template-columns: 1fr;
+  }
+}
+.arithmetic-form[data-operation='fma'] {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 0.9fr);
+}
+.arithmetic-operands[data-operation='fma'] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 1000px) {
+  .arithmetic-form[data-operation='fma'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .arithmetic-operands[data-operation='fma'] {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 720px) {
+  .arithmetic-form[data-operation='fma'] {
+    grid-template-columns: 1fr;
+  }
+}

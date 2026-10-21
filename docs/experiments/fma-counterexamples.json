@@ -1,0 +1,236 @@
+{
+  "seed": "0x6f70656e",
+  "attempts": 34,
+  "independentLatticeVerified": true,
+  "softFloatVerified": true,
+  "examples": [
+    {
+      "operands": ["0x3c01", "0x3c01", "0xbc02"],
+      "values": ["1.0009765625", "1.0009765625", "-1.001953125"],
+      "exactProduct": "1.00195407867431640625",
+      "exactResult": "0.00000095367431640625",
+      "roundedProduct": {
+        "bits": "0x3c02",
+        "value": "1.001953125"
+      },
+      "fused": {
+        "bits": "0x0010",
+        "value": "0.00000095367431640625",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": false
+        }
+      },
+      "nonfused": {
+        "bits": "0x0000",
+        "value": "0",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "difference": "0.00000095367431640625",
+      "explanation": "Intermediate multiplication rounding discards bits before addition; FMA preserves them until its single final rounding."
+    },
+    {
+      "operands": ["0x7bff", "0x4000", "0xfbff"],
+      "values": ["65504", "2", "-65504"],
+      "exactProduct": "131008",
+      "exactResult": "65504",
+      "roundedProduct": {
+        "bits": "0x7c00",
+        "value": "Infinity"
+      },
+      "fused": {
+        "bits": "0x7bff",
+        "value": "65504",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": false
+        }
+      },
+      "nonfused": {
+        "bits": "0x7c00",
+        "value": "Infinity",
+        "flags": {
+          "invalid": false,
+          "overflow": true,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "difference": "Undefined for nonfinite output",
+      "explanation": "Intermediate multiplication overflows before cancellation; FMA retains the exact finite product until after addition."
+    },
+    {
+      "operands": ["0x0480", "0x671f", "0xae26"],
+      "values": ["0.00006866455078125", "1823", "-0.0960693359375"],
+      "exactProduct": "0.12517547607421875",
+      "exactResult": "0.02910614013671875",
+      "roundedProduct": {
+        "bits": "0x3001",
+        "value": "0.1251220703125"
+      },
+      "fused": {
+        "bits": "0x2774",
+        "value": "0.02911376953125",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "nonfused": {
+        "bits": "0x2770",
+        "value": "0.029052734375",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "difference": "0.00006103515625",
+      "explanation": "Intermediate multiplication rounding discards bits before addition; FMA preserves them until its single final rounding."
+    },
+    {
+      "operands": ["0xea0d", "0x8caf", "0x1dd5"],
+      "values": ["-3098", "-0.0002858638763427734375", "0.005695343017578125"],
+      "exactProduct": "0.885606288909912109375",
+      "exactResult": "0.891301631927490234375",
+      "roundedProduct": {
+        "bits": "0x3b16",
+        "value": "0.8857421875"
+      },
+      "fused": {
+        "bits": "0x3b21",
+        "value": "0.89111328125",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "nonfused": {
+        "bits": "0x3b22",
+        "value": "0.8916015625",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "difference": "-0.00048828125",
+      "explanation": "Intermediate multiplication rounding discards bits before addition; FMA preserves them until its single final rounding."
+    },
+    {
+      "operands": ["0xb401", "0x9237", "0x8c4a"],
+      "values": [
+        "-0.250244140625",
+        "-0.000758647918701171875",
+        "-0.000261783599853515625"
+      ],
+      "exactProduct": "0.000189847196452319622039794921875",
+      "exactResult": "-0.000071936403401196002960205078125",
+      "roundedProduct": {
+        "bits": "0x0a39",
+        "value": "0.00018990039825439453125"
+      },
+      "fused": {
+        "bits": "0x84b7",
+        "value": "-0.000071942806243896484375",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "nonfused": {
+        "bits": "0x84b6",
+        "value": "-0.00007188320159912109375",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "difference": "-0.000000059604644775390625",
+      "explanation": "Intermediate multiplication rounding discards bits before addition; FMA preserves them until its single final rounding."
+    },
+    {
+      "operands": ["0xc07c", "0xbc6f", "0xc16a"],
+      "values": ["-2.2421875", "-1.1083984375", "-2.70703125"],
+      "exactProduct": "2.48523712158203125",
+      "exactResult": "-0.22179412841796875",
+      "roundedProduct": {
+        "bits": "0x40f8",
+        "value": "2.484375"
+      },
+      "fused": {
+        "bits": "0xb319",
+        "value": "-0.2218017578125",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "nonfused": {
+        "bits": "0xb320",
+        "value": "-0.22265625",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "difference": "0.0008544921875",
+      "explanation": "Intermediate multiplication rounding discards bits before addition; FMA preserves them until its single final rounding."
+    },
+    {
+      "operands": ["0x7b64", "0x9e55", "0xcd39"],
+      "values": ["60544", "-0.006183624267578125", "-20.890625"],
+      "exactProduct": "-374.38134765625",
+      "exactResult": "-395.27197265625",
+      "roundedProduct": {
+        "bits": "0xddda",
+        "value": "-374.5"
+      },
+      "fused": {
+        "bits": "0xde2d",
+        "value": "-395.25",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "nonfused": {
+        "bits": "0xde2e",
+        "value": "-395.5",
+        "flags": {
+          "invalid": false,
+          "overflow": false,
+          "underflow": false,
+          "inexact": true
+        }
+      },
+      "difference": "0.25",
+      "explanation": "Intermediate multiplication rounding discards bits before addition; FMA preserves them until its single final rounding."
+    }
+  ]
+}

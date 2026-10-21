@@ -1,5 +1,10 @@
 import type { ArithmeticStage } from '../../lib/numerics/fp16Arithmetic'
-import { describeStage, STAGE_TITLES } from '../../lib/arithmetic/presentation'
+import { STAGE_TITLES } from '../../lib/arithmetic/presentation'
+import type { MultiplyStage } from '../../lib/numerics/fp16Multiply'
+import {
+  describeMultiplyStage,
+  MULTIPLY_STAGE_TITLES,
+} from '../../lib/arithmetic/multiplyPresentation'
 
 /** Renders the engine's actual stages; it never recomputes numerical intermediates. */
 export function ArithmeticTrace({
@@ -7,12 +12,13 @@ export function ArithmeticTrace({
   step,
   setStep,
 }: {
-  trace: ArithmeticStage[]
+  trace: (ArithmeticStage | MultiplyStage)[]
   step: number
   setStep: (step: number) => void
 }) {
   const stage = trace[step]
-  const details = describeStage(stage)
+  const titles = { ...STAGE_TITLES, ...MULTIPLY_STAGE_TITLES }
+  const details = describeMultiplyStage(stage)
   return (
     <section
       className="arithmetic-trace"
@@ -45,7 +51,7 @@ export function ArithmeticTrace({
               aria-current={step === index ? 'step' : undefined}
               onClick={() => setStep(index)}
             >
-              {index + 1}. {STAGE_TITLES[entry.kind]}
+              {index + 1}. {titles[entry.kind]}
             </button>
           </li>
         ))}
@@ -78,9 +84,9 @@ export function ArithmeticTrace({
           role="status"
           aria-label="Arithmetic trace position"
         >
-          Stage {step + 1} of {trace.length} · {STAGE_TITLES[stage.kind]}
+          Stage {step + 1} of {trace.length} · {titles[stage.kind]}
         </p>
-        <h4>{STAGE_TITLES[stage.kind]}</h4>
+        <h4>{titles[stage.kind]}</h4>
         <p className="muted">{details.explanation}</p>
         {stage.kind === 'grs' && (
           <div className="arithmetic-grs" aria-label="Rounding bits">

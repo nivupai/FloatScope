@@ -4,11 +4,56 @@ An open-source interactive laboratory for understanding IEEE 754 floating-point 
 
 FP Play aims to connect bit representations, rounding decisions, and numerical effects through accessible visual explanations and carefully tested models.
 
-## Current scope: Milestone 5
+## Current scope: Milestone 6
 
 FP Play includes an interactive FP16 Explorer, a **Floating-Point Precision Microscope**, and an **Arithmetic Pipeline Explorer**, powered by the validated binary16 numerical models. The microscope connects discrete representable values, rounding cells, quantization error, and ULP spacing across the number line. Vite, React, TypeScript, Tailwind CSS, Vitest, ESLint, Prettier, and GitHub Actions provide the foundation.
 
-**Representation, precision exploration, and FP16 addition/subtraction traces are interactive.** The new Arithmetic Explorer uses exact dyadic arithmetic, one nearest-even rounding, and computation-derived stages. Multiplication, FMA, division, transformer attention, and hardware simulation remain future work. No application dependencies were added.
+**Representation, precision exploration, and FP16 add/subtract/multiply/FMA traces are interactive.** Arithmetic Explorer uses exact BigInt dyadics and nearest-even rounding, with a side-by-side fused versus nonfused comparison. Division, transformer attention, and hardware simulation remain future work. No application dependencies were added.
+
+## Multiplication and fused multiply-add
+
+Open **Arithmetic**, select **A × B** or **FMA(A, B, C) / nonfused comparison**, then enter decimal/scientific or raw hex operands and press **Trace operation**. C appears for FMA. Decimal text is parsed into binary64 and independently quantized to FP16 before arithmetic; raw hex preserves signaling NaN metadata. Invalid input leaves the applied calculation intact.
+
+The FMA view shows all three applied operands, the exact product and mathematical result, **fused output**, **rounded intermediate product**, **nonfused output**, binary/hex encodings, flags, and the numerical difference when both outputs are finite. Use **Inspect computation path** to follow the fused operation, nonfused multiplication, or nonfused addition with the same keyboard-accessible stage viewer. The paths show their actual computation stages, not chip cycles.
+
+```ts
+import {
+  multiplyFP16,
+  fmaFP16,
+  nonfusedMultiplyAddFP16,
+} from './src/lib/numerics'
+
+multiplyFP16(0x3e00, 0x4000).bits // 1.5 × 2 = 3 / 0x4200
+fmaFP16(0x3c01, 0x3c01, 0xbc02).bits // exact residual 2^-20 / 0x0010
+nonfusedMultiplyAddFP16(0x3c01, 0x3c01, 0xbc02).bits // rounded product loses residual: +0
+fmaFP16(0x7bff, 0x4000, 0xfbff).bits // 65504 × 2 − 65504 = 65504 / 0x7bff
+nonfusedMultiplyAddFP16(0x7bff, 0x4000, 0xfbff).bits // intermediate overflow: Infinity
+```
+
+Multiplication forms the exact up-to-22-bit significand product and adds operand scale exponents, then rounds once. **True FMA** aligns that unrounded product with C, sums exactly in BigInts, and rounds only the final result. **Nonfused** calculation rounds the FP16 product first and then performs a separately rounded FP16 addition; its flags are the union of both operations. Binary16 FMA is different from FP32 accumulation. Ten new explained presets cover sign/exponent arithmetic, exact and subnormal products, underflow, overflow, invalid zero × infinity, midpoint rounding, cancellation, lost residuals, and avoided intermediate overflow.
+
+NaN selection extends the existing first-signaling/otherwise-first-quiet policy to A/B/C order. Zero × infinity raises invalid even with a quiet NaN addend; the selected NaN keeps its original sign and nine payload bits. An infinite product plus the opposite infinity is invalid; a finite FMA product has no intermediate FP16 range restriction. All returned indicators are per operation; input conversion flags and global sticky state are outside this model.
+
+**Tininess after rounding** uses eleven-bit precision with unbounded exponent range, not just the final stored exponent. Underflow additionally requires inexactness. Near the normal boundary a stored `0x0400` can still raise underflow; this is explicitly tested against SoftFloat. Exact subnormals never raise underflow. The exact dyadic coefficient/exponent is authoritative: FMA's compatibility `exact.value` Number projection can round, while every displayed exact decimal is formatted directly from BigInts.
+
+MAC operations are central to neural-network dot products. Retaining product bits through an addition can preserve small cancellation residuals and avoid transient overflow. This view teaches those single-operation effects without modeling an accelerator's throughput, accumulation format, reduction ordering, or proprietary hardware.
+
+### Milestone 6 validation and experiments
+
+**338 tests pass**, preserving all 275 existing tests unchanged, plus 46 numerical and 17 UI integration tests. Validation includes exhaustive raw-pattern identities, signed zero and NaN cross products, independently rounded fixed-lattice references, 30,000 deterministic random pairs/triples, full trace reconstruction, exact decimal reconstruction, and keyboard controls. Heavy numerical loops have per-test 30-second budgets; no global timeout was increased.
+
+The extended Berkeley SoftFloat harness checked **536,888 operations with zero mismatches**: 115,936 add, 115,936 subtract, 181,476 multiply, and 123,540 FMA. Non-NaN bits and all four flags match exactly; 28,618 NaN results match quiet classification and flags, with payload/sign checked separately against the documented policy. The optional search independently verified seven fused/nonfused counterexamples, including five fixed-seed discoveries, and performed another 21 matching SoftFloat checks when supplied a compiled driver.
+
+```sh
+node scripts/validate-softfloat.mjs /tmp/fp-play-softfloat-driver
+node scripts/search-fma.mjs /tmp/fp-play-softfloat-driver
+# Without SoftFloat, counterexamples are still checked by the independent lattice:
+node scripts/search-fma.mjs
+```
+
+Recompile the driver for its updated four-field input protocol; setup, stage models, exact tininess definitions, and corpus limits are in [the multiplication/FMA documentation](src/lib/arithmetic/MULTIPLY_FMA.md). The [committed experiment output](docs/experiments/fma-counterexamples.json) records raw operands, exact decimal values, intermediate product, final results, flags, differences, and explanations. Neither this corpus nor the internal suite establishes full IEEE 754 conformance; TestFloat was not run.
+
+No browser was connected for Milestone 6 visual review. Automated real-engine DOM and keyboard tests pass; rendering, theme/focus appearance, touch behavior, and assistive-technology announcements remain unverified.
 
 ## Using the Arithmetic Explorer
 
@@ -20,7 +65,7 @@ Open **Arithmetic** in the header, or scroll below the microscope.
 4. Use **Previous stage / Next stage**, or select any stage directly. Focus the detail panel for **Left/Right** and **Home/End** shortcuts. Native stage buttons support Tab, Space, and Enter. Inspect the lossless alignment tail, signed integer sum, normalization shifts, guard/round/sticky bits, tie parity, carry, result encoding, and per-operation flags. Long binary rows scroll within their panels on small screens.
 5. Try all ten explained presets: exact addition, large exponent difference, nearest-even tie, cancellation, subnormal arithmetic, transition to normal, overflow, infinity arithmetic, invalid infinities, and signaling NaN. Each preset displays its expected raw result.
 
-### Arithmetic semantics
+### Addition/subtraction semantics
 
 `addFP16(aBits, bBits)`, `subtractFP16(aBits, bBits)`, and `calculateFP16(aBits, bBits, 'add' | 'subtract')` accept validated raw uint16 patterns. They return result `bits`, `decoded`, an exact dyadic `{ coefficient: bigint, exponent, value }` for finite operands, a discriminated stage `trace`, and `flags`. `value` is an exact binary64 display projection; the core uses BigInts, not Number addition. Finite dyadics are aligned without discarding any tail, summed with signs, normalized, and rounded **once, nearest, ties to even**. The GRS increment rule is `guard && (round || sticky || retainedOdd)`.
 
@@ -39,9 +84,9 @@ addFP16(0xfc11, 0x3c00).bits // 0xfe11: quiet signaling NaN, preserve sign/paylo
 - **Flags:** `invalid`, `overflow`, `underflow`, and `inexact` describe this operation only; there is no sticky global status. Overflow returns signed infinity and sets inexact, even when no significand bits were discarded. Underflow means **tiny after rounding AND inexact**. All finite FP16 operands are multiples of `2**-24`; any tiny sum/difference is consequently exactly representable, so add/sub cannot raise underflow. Input conversion flags are outside this arithmetic result. Division-by-zero is irrelevant to add/sub and is not exposed.
 - **Trace:** finite operations have eight conceptual stages; specials have decode → special-value short circuit → encode. These are explanatory algorithm stages, **not clock cycles, latency, RTL, or a proprietary hardware pipeline**. Returned BigInt fields require explicit conversion before JSON serialization.
 
-FP16's eleven-bit normal significand makes accelerator storage and arithmetic economical, but alignment can move a small contribution entirely below retained precision. Repeated rounded additions can lose contributions or amplify cancellation effects; accumulation format and operation ordering therefore matter. This milestone demonstrates single add/sub operations, not accelerator performance, reductions, or a specific device's handling of denormals.
+FP16's eleven-bit normal significand makes accelerator storage and arithmetic economical, but alignment can move a small contribution entirely below retained precision. Repeated rounded additions can lose contributions or amplify cancellation effects; accumulation format and operation ordering therefore matter. These add/sub traces demonstrate single operations; they do not model accelerator performance, reductions, or a specific device's handling of denormals.
 
-See [the arithmetic model, trace contract, and reproducible validation](src/lib/arithmetic/README.md). This limited educational model does **not claim full IEEE 754 conformance**: only binary16 add/sub and nearest-even are supported. No multiplication, FMA, division, alternate rounding modes, hardware timing, or global exception state is implemented.
+See [the arithmetic model, trace contract, and reproducible validation](src/lib/arithmetic/README.md). This limited educational model does **not claim full IEEE 754 conformance**: binary16 add/sub, multiplication, and FMA use nearest-even. Division, alternate rounding modes, hardware timing, and global exception state remain unsupported.
 
 ### Milestone 5 verification
 
@@ -97,7 +142,7 @@ Presets use explicit validated bit patterns for +0, -0, 1.0, 1.5, the smallest/l
 
 - Finite FP16 output uses its exact terminating decimal expansion (up to 24 fractional places), with no display rounding; negative zero is shown as `-0`.
 - Decimal text is first parsed into a JavaScript binary64 Number. Parsing may round, or underflow to signed zero, before FP16 conversion. FP Play does not parse decimal strings as exact rationals. The original text and parsed Number are shown to make this boundary visible.
-- Raw NaN edits preserve sign, quiet/signaling bit, and payload. Submitting `NaN` canonicalizes to positive quiet NaN `0x7e00`; JavaScript Number cannot retain the original FP16 NaN metadata. The representation Explorer does not execute signaling NaNs or report conversion exception flags; the Arithmetic Explorer separately models add/sub indicators.
+- Raw NaN edits preserve sign, quiet/signaling bit, and payload. Submitting `NaN` canonicalizes to positive quiet NaN `0x7e00`; JavaScript Number cannot retain the original FP16 NaN metadata. The representation Explorer does not execute signaling NaNs or report conversion exception flags; the Arithmetic Explorer separately models arithmetic indicators.
 - ULP uses the engine's sign-independent binade-spacing definition, not necessarily the gap to the next greater value. Infinity returns Infinity and NaN returns NaN; neither has a finite ULP. Outward stepping at infinity saturates. NaN neighbor controls are disabled because NaNs are unordered.
 - Real-browser visual verification is unavailable in the current environment. Automated DOM tests cover interactions and semantics; manual review of layout, themes, focus rendering, and screen-reader announcements is still needed.
 
@@ -132,7 +177,7 @@ floatToFP16Bits(1 + 2 ** -11) // 0x3c00: exact halfway tie rounds to even
 
 Encoding rounds directly from the input binary64 Number to binary16 using round-to-nearest, ties-to-even, including gradual underflow and overflow. Raw-bit APIs accept integers from 0 to 65535 and throw `RangeError` for invalid patterns. Adjacent-value APIs accept and return **raw bit patterns**. ULP means sign-independent binade spacing: `2**-24` at zero/subnormals, 32 at maximum finite magnitude, Infinity at infinities, and NaN at NaNs.
 
-Raw NaN inspection preserves the sign, fraction, quiet/signaling bit, and payload. JavaScript Numbers cannot preserve the original FP16 NaN payload or sign through conversion; encoding any Number NaN produces positive quiet NaN `0x7e00`. Exact representability includes signed zeros and infinities but excludes NaN by policy. The conversion/introspection APIs do not expose exception flags or alternative rounding modes. Arithmetic is provided by the separate add/sub model described above. See the [full API contract, algorithms, validation, and limitations](src/lib/numerics/README.md).
+Raw NaN inspection preserves the sign, fraction, quiet/signaling bit, and payload. JavaScript Numbers cannot preserve the original FP16 NaN payload or sign through conversion; encoding any Number NaN produces positive quiet NaN `0x7e00`. Exact representability includes signed zeros and infinities but excludes NaN by policy. The conversion/introspection APIs do not expose exception flags or alternative rounding modes. Arithmetic is provided by the separate add/sub/multiply/FMA models described above. See the [full API contract, algorithms, validation, and limitations](src/lib/numerics/README.md).
 
 ## Setup
 
@@ -179,6 +224,8 @@ src/
   lib/microscope/         Precision examples, boundary formatting, and model docs
   lib/numerics/           Binary16 conversion, introspection, types, and API docs
     fp16Arithmetic.ts     Exact add/sub and typed computation trace
+    fp16Multiply.ts       Exact multiplication, FMA, and nonfused comparison
+    roundDyadicFP16.ts    Shared rounding, GRS, and exception decisions
     microscope.ts         Pure lattice, viewport, rounding-cell, error, ULP models
   lib/arithmetic/         Arithmetic presentation, examples, and model docs
   components/arithmetic/  Operand/result UI and stage viewer
@@ -195,11 +242,12 @@ Tests retain all Milestone 2 numerical checks: all 65,536 binary16 patterns, eve
 2. **Binary16 numerical engine** — encoding, decoding, rounding, and introspection (completed).
 3. **Interactive FP16 Explorer** — bit editing, decimal quantization, explanations, presets, adjacent values, and ULP (completed).
 4. **Precision Microscope** — interactive number line, rounding cells, error analysis, and ULP/binade exploration (completed).
-5. **Arithmetic traces** — exact FP16 addition/subtraction and computation-derived rounding traces (this milestone); multiplication is future work.
-6. **Formats and AI experiments** — future FP16, BF16, FP32, and transformer attention precision experiments.
-7. **Optional hardware work** — original open RTL implementations and hardware validation.
+5. **Arithmetic traces** — exact FP16 addition/subtraction and computation-derived rounding traces (completed).
+6. **Multiplication and FMA** — exact products, single-rounding fusion, and nonfused comparison (this milestone).
+7. **Formats and AI experiments** — future FP16, BF16, FP32, and transformer attention precision experiments.
+8. **Optional hardware work** — original open RTL implementations and hardware validation.
 
-The foundation, numerical engine, representation Explorer, precision microscope, and addition/subtraction explorer are implemented. Later stages are planned capabilities, not delivery dates.
+The foundation, numerical engine, representation Explorer, precision microscope, and add/subtract/multiply/FMA explorer are implemented. Later stages are planned capabilities, not delivery dates.
 
 ## Engineering principles
 

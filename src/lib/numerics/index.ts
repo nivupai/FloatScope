@@ -18,3 +18,14 @@ export type {
   FP16ArithmeticResult,
   FP16Operation,
 } from './fp16Arithmetic'
+export {
+  multiplyFP16,
+  fmaFP16,
+  nonfusedMultiplyAddFP16,
+  compareMultiplyAddFP16,
+} from './fp16Multiply'
+export type {
+  FP16MultiplyResult,
+  MultiplyStage,
+  NonfusedMultiplyAddResult,
+} from './fp16Multiply'
