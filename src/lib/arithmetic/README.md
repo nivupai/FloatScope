@@ -1,6 +1,6 @@
 # Binary16 arithmetic model
 
-This original educational implementation supports **raw binary16 addition and subtraction**, rounded once with **round-to-nearest, ties-to-even**. It is independent of React and of proprietary hardware. It does not claim full IEEE 754 conformance.
+This page documents the original **raw binary16 addition and subtraction** APIs. See [multiplication, FMA, and nonfused comparison](MULTIPLY_FMA.md) for the Milestone 6 extension and current verification. The add/sub implementation rounds once with **round-to-nearest, ties-to-even**. It is independent of React and of proprietary hardware. It does not claim full IEEE 754 conformance.
 
 ## API
 
@@ -18,7 +18,7 @@ Both operands are integer uint16 patterns (0…65535); invalid patterns and unsu
 - `bits`, `decoded`: final packed result and existing `DecodedFP16` fields.
 - `roundingMode: 'nearest-even'`, `tininessDetection: 'after-rounding'`.
 - `flags: { invalid, overflow, underflow, inexact }`: booleans for this operation, not sticky global state.
-- `exact: { coefficient: bigint, exponent: number, value: number } | null`: mathematical signed integer times a power of two, before rounding. `null` for special operands; a finite overflow still has an exact finite sum. `value` preserves signed zero and is an exact Number projection, not the computation method.
+- `exact: { coefficient: bigint, exponent: number, value: number } | null`: mathematical signed integer times a power of two, before rounding. `null` for special operands; a finite overflow still has an exact finite sum. `value` preserves signed zero and is an exact Number projection for these add/sub APIs, not the computation method. FMA can require more than 53 bits; its coefficient/exponent, rather than Number projection, is authoritative.
 - `trace: ArithmeticStage[]`: a discriminated union of actual computation records. BigInts need explicit serialization; plain `JSON.stringify(result)` is unsupported.
 
 Result objects are fresh per call. Consumers should treat their fields as immutable; mutating a returned object does not change subsequent calculations.
@@ -53,7 +53,7 @@ NaN payload selection is a deterministic **FP Play policy**, distinct from requi
 
 Subnormals are never flushed to zero. Tiny FP16 add/sub results are exact multiples of the subnormal quantum and need no rounding; therefore no valid input pair can raise underflow. Input conversion can underflow but is a separate operation whose flags are not exposed here. Overflow sets inexact even if the unbounded significand happened to need no discarded bits (for example, 65504 + 65504).
 
-There are no division-by-zero indicators, global sticky state, traps, directed rounding modes, multiplication, FMA, division, reductions, or RTL simulation in this model.
+Multiplication and FMA are now provided by the [Milestone 6 extension](MULTIPLY_FMA.md). There are no division-by-zero indicators, global sticky state, traps, directed rounding modes, division, reductions, or RTL simulation.
 
 ## Trace contract
 
@@ -106,6 +106,8 @@ cc -O2 -I/tmp/fp-play-softfloat/source/include \
   -o /tmp/fp-play-softfloat-driver
 node scripts/validate-softfloat.mjs /tmp/fp-play-softfloat-driver
 ```
+
+This section records Milestone 5 validation. The current driver accepts four fields (`hexA hexB operation hexC`) and adds multiplication/FMA; recompile it before running the [expanded Milestone 6 corpus](MULTIPLY_FMA.md#verification-and-reproducible-counterexamples).
 
 The driver sets `softfloat_round_near_even` and `softfloat_tininess_afterRounding`, clears status before each operation, and reports raw output and flags. The JavaScript runner uses the existing TypeScript dependency to transpile the production engine into a cleaned temporary directory; no new dependency is required.
 
