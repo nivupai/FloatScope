@@ -1,4 +1,5 @@
 import { decodeFP16 } from './fp16'
+import { roundDyadicFP16 } from './roundDyadicFP16'
 import type { DecodedFP16 } from './fp16'
 
 export type FP16Operation = 'add' | 'subtract'
@@ -11,7 +12,8 @@ export interface ArithmeticFlags {
 export interface ExactDyadic {
   coefficient: bigint
   exponent: number
-  /** Exact binary64 display projection: any finite FP16 sum needs at most 41 bits. */
+  /** Number display projection. Exact for add/sub/products; FMA may round.
+   * Use coefficient/exponent (not value) for exact arithmetic or decimal display. */
   value: number
 }
 export interface FiniteSignificand {
@@ -55,6 +57,8 @@ export interface RoundingDecision {
   carry: boolean
   finalSignificand: bigint
   finalExponent: number
+  /** Tininess at eleven-bit precision with unbounded exponent range. */
+  tinyAfterPrecisionRounding: boolean
 }
 export type ArithmeticStage =
   | { kind: 'decode'; a: DecodedFP16; b: DecodedFP16; effectiveBSign: 0 | 1 }
@@ -245,83 +249,10 @@ export function calculateFP16(
   // RNE cancellation is +0, except when both effective operands are negative zero.
   const sign =
     sum < 0n || (sum === 0n && fa.sign === 1 && fb.sign === 1) ? 1 : 0
-  const magnitude = sum < 0n ? -sum : sum
-  const leadingBitIndex =
-    magnitude === 0n ? null : magnitude.toString(2).length - 1
-  const exactExponent =
-    leadingBitIndex === null ? null : leadingBitIndex + quantumExponent
-  const encodingExponent = Math.max(-14, exactExponent ?? -14)
-  const outputQuantum = encodingExponent - 10
-  const shift = outputQuantum - quantumExponent
-  const retained =
-    shift > 0 ? magnitude >> BigInt(shift) : magnitude << BigInt(-shift)
-  trace.push({
-    kind: 'normalize',
-    magnitude,
-    leadingBitIndex,
-    exactExponent,
-    encodingExponent,
-    quantumExponent: outputQuantum,
-    shift,
-    retained,
-  })
-  const discardCount = Math.max(0, shift)
-  const remainder = shift > 0 ? magnitude - (retained << BigInt(shift)) : 0n
-  const guard = (
-    shift >= 1 ? Number((magnitude >> BigInt(shift - 1)) & 1n) : 0
-  ) as 0 | 1
-  const round = (
-    shift >= 2 ? Number((magnitude >> BigInt(shift - 2)) & 1n) : 0
-  ) as 0 | 1
-  const sticky = (
-    shift >= 3 && (magnitude & ((1n << BigInt(shift - 2)) - 1n)) !== 0n ? 1 : 0
-  ) as 0 | 1
-  trace.push({
-    kind: 'grs',
-    guard,
-    round,
-    sticky,
-    discardCount,
-    discardedBits: discardCount
-      ? remainder.toString(2).padStart(discardCount, '0')
-      : '',
-    remainder,
-  })
-  const retainedWasOdd = (retained & 1n) !== 0n
-  const halfway = guard === 1 && round === 0 && sticky === 0
-  const increment =
-    guard === 1 && (round === 1 || sticky === 1 || retainedWasOdd)
-  const rounded = retained + (increment ? 1n : 0n)
-  const carry = rounded === 2048n
-  const finalSignificand = carry ? rounded >> 1n : rounded
-  const finalExponent = encodingExponent + (carry ? 1 : 0)
-  trace.push({
-    kind: 'round',
-    increment,
-    halfway,
-    retainedWasOdd,
-    rounded,
-    carry,
-    finalSignificand,
-    finalExponent,
-  })
-  flags.overflow = finalExponent > 15
-  flags.inexact = remainder !== 0n || flags.overflow
-  let bits: number
-  if (flags.overflow) bits = (sign << 15) | 0x7c00
-  else if (
-    finalSignificand === 0n ||
-    (finalExponent === -14 && finalSignificand < 1024n)
-  )
-    bits = (sign << 15) | Number(finalSignificand)
-  else
-    bits =
-      (sign << 15) |
-      ((finalExponent + 15) << 10) |
-      Number(finalSignificand - 1024n)
-  // Tininess after rounding AND inexact. For binary16 add/sub only, tiny results
-  // are exact multiples of 2**-24, so underflow cannot be raised by valid operands.
-  flags.underflow = !flags.overflow && (bits & 0x7c00) === 0 && flags.inexact
+  const rounded = roundDyadicFP16(sum < 0n ? -sum : sum, quantumExponent, sign)
+  trace.push(...rounded.trace)
+  Object.assign(flags, rounded.flags)
+  const bits = rounded.bits
   const exactValue =
     sum === 0n && sign === 1 ? -0 : Number(sum) * 2 ** quantumExponent
   return finish(bits, {
