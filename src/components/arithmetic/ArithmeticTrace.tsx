@@ -106,7 +106,13 @@ export function ArithmeticTrace({
           {details.rows.map(([label, value]) => (
             <div key={label}>
               <dt>{label}</dt>
-              <dd aria-label={label}>{value}</dd>
+              <dd
+                aria-label={label}
+                tabIndex={value.length > 24 ? 0 : undefined}
+                title={value}
+              >
+                {value}
+              </dd>
             </div>
           ))}
         </dl>

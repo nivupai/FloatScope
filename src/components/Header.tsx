@@ -19,7 +19,7 @@ export function Header({
           </span>
         </a>
         <nav aria-label="Primary" className="primary-nav">
-          <a href="#explorer">FP16 Explorer</a>
+          <a href="#explorer">Bit Explorer</a>
           <a href="#microscope">Microscope</a>
           <a href="#arithmetic">Arithmetic</a>
         </nav>

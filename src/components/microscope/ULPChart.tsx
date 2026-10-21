@@ -29,7 +29,12 @@ export function ULPChart({
           Magnitude (x) · absolute ULP (y) · log₂ axes
         </span>
       </div>
-      <div className="microscope-chart-shell">
+      <div
+        className="microscope-chart-shell"
+        role="group"
+        aria-label="Scrollable ULP plot"
+        tabIndex={0}
+      >
         <svg
           className="ulp-chart"
           viewBox="0 0 1000 285"

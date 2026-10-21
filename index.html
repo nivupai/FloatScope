@@ -3,15 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f8fafc" />
+    <meta
+      name="theme-color"
+      content="#f5f7fa"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#0c1321"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <meta
       name="description"
       content="FP Play is an open-source laboratory for understanding floating-point arithmetic and numerical precision in AI accelerators."
     />
+    <meta property="og:title" content="FP Play — Make precision visible" />
+    <meta
+      property="og:description"
+      content="Explore FP16 bits, numerical precision, arithmetic pipelines, and fused versus nonfused rounding in an open scientific computing laboratory."
+    />
+    <meta property="og:type" content="website" />
     <title>FP Play — Floating-point laboratory</title>
   </head>
   <body>
     <div id="root"></div>
+    <noscript
+      >FP Play needs JavaScript for its interactive numerical experiments.
+      Technical documentation is available at
+      <a href="https://github.com/nivupai/fp-play">the FP Play repository</a
+      >.</noscript
+    >
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

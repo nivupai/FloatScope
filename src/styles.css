@@ -74,6 +74,7 @@
   --fraction: #0c7165;
   --fraction-bg: #edfaf5;
   --fraction-border: #a7dace;
+  --control-border: #7c899d;
   --error: #b42318;
   color-scheme: light;
   min-height: 100vh;
@@ -101,6 +102,7 @@
   --fraction: #8ee2cd;
   --fraction-bg: #13332f;
   --fraction-border: #376b60;
+  --control-border: #7b8ba3;
   --error: #ffb4ab;
   color-scheme: dark;
 }
@@ -124,6 +126,7 @@
     --fraction: #8ee2cd;
     --fraction-bg: #13332f;
     --fraction-border: #376b60;
+    --control-border: #7b8ba3;
     --error: #ffb4ab;
     color-scheme: dark;
   }
@@ -1370,4 +1373,331 @@
   .arithmetic-form[data-operation='fma'] {
     grid-template-columns: 1fr;
   }
+}
+
+/* v0.1.0 release polish: clear entry points, readable data, and keyboard access. */
+.app-shell {
+  font-size: 16px;
+}
+.hero {
+  align-items: center;
+  padding-block: 52px 32px;
+  gap: 40px;
+}
+.hero h1 {
+  font-size: clamp(3rem, 6vw, 4.6rem);
+  letter-spacing: -0.065em;
+}
+.hero-tagline {
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  margin-block: 12px 8px;
+}
+.hero-description {
+  max-width: 660px;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+.landing-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+  align-items: center;
+  margin-top: 24px;
+  font-size: 0.8rem;
+}
+.landing-links a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.landing-links > a:not(.primary-button) {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.landing-note {
+  flex: 0 0 280px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  font-size: 0.9rem;
+}
+.release-badge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  align-items: center;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  margin-bottom: 16px;
+}
+.release-badge span {
+  font-family: var(--font-sans);
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+.landing-section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-block: 18px;
+}
+.landing-section-heading h2 {
+  font-size: 1.1rem;
+}
+.experience-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.experience-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+.experience-card h3 {
+  font-size: 1rem;
+}
+.experience-card p {
+  color: var(--muted);
+  font-size: 0.83rem;
+  line-height: 1.7;
+}
+.experience-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 14px;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.experience-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+.landing-context {
+  max-width: 1000px;
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+.landing-limits {
+  border-left: 2px solid var(--fraction);
+  padding-left: 14px;
+  margin-block: 14px 38px;
+}
+.explorer-header {
+  flex-wrap: wrap;
+}
+.explorer-header h2 {
+  font-size: 1.5rem;
+}
+.explorer-content > *,
+.panel-heading > *,
+.panel,
+.microscope-toolbar label {
+  min-width: 0;
+}
+.arithmetic-stages {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: visible;
+}
+.arithmetic-stages button {
+  width: 100%;
+  height: 100%;
+  min-height: 48px;
+  white-space: normal;
+  text-align: left;
+  font-size: 0.8rem;
+}
+.arithmetic-step-controls button {
+  min-height: 44px;
+}
+.arithmetic-stage-data dd {
+  padding: 4px;
+}
+.arithmetic-stage-data dd:focus-visible {
+  outline-offset: -2px;
+  border-radius: 3px;
+}
+.arithmetic-encoding {
+  flex-wrap: wrap;
+}
+.arithmetic-field code {
+  font-size: 0.9rem;
+}
+.arithmetic-value,
+.microscope-metrics output {
+  font-variant-numeric: tabular-nums;
+}
+.arithmetic-mode {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.fma-entry {
+  min-width: 0;
+  scroll-margin-top: 24px;
+}
+.fma-introduction {
+  background: var(--subtle);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.fma-introduction h3 {
+  margin-block: 4px 8px;
+}
+.fma-introduction .primary-button {
+  flex-shrink: 0;
+}
+.fusion-results {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+.fusion-results .panel:first-child {
+  border-color: var(--exponent-border);
+  background: var(--exponent-bg);
+}
+.fusion-results .panel:last-child {
+  border-color: var(--fraction-border);
+  background: var(--fraction-bg);
+}
+.microscope-toolbar button,
+.microscope-toolbar select,
+.microscope-target-controls select,
+.ulp-region-picker select,
+.theme-picker select {
+  min-height: 44px;
+}
+.microscope-chart-shell,
+.table-scroll {
+  padding: 5px;
+  margin-inline: -5px;
+  overscroll-behavior-x: contain;
+}
+.microscope-chart-shell:focus-visible,
+.table-scroll:focus-visible {
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+.microscope-target-controls input {
+  min-height: 44px;
+}
+.text-button {
+  min-height: 44px;
+}
+.primary-nav a,
+.site-footer a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.site-footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px 24px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-inline: 20px;
+}
+.site-footer a {
+  text-decoration: underline;
+}
+@media (max-width: 1050px) {
+  .hero {
+    align-items: stretch;
+    gap: 20px;
+  }
+  .landing-note {
+    flex-basis: 230px;
+  }
+  .experience-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .fusion-results {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .hero {
+    flex-direction: column;
+    padding-block: 28px 16px;
+  }
+  .landing-note {
+    flex-basis: auto;
+  }
+  .primary-nav {
+    gap: 16px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .arithmetic-stages {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .fma-introduction {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .arithmetic-stage-data dd {
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 460px) {
+  .experience-grid {
+    grid-template-columns: 1fr;
+  }
+  .experience-card {
+    padding: 18px;
+  }
+  .header-inner {
+    gap: 12px;
+  }
+  .theme-picker select {
+    max-width: 140px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .experience-card {
+    transition: none;
+  }
+}
+.input-row input,
+.arithmetic-form input,
+.arithmetic-form select,
+.theme-picker select,
+.microscope-toolbar button,
+.microscope-toolbar select,
+.microscope-target-controls select,
+.ulp-region-picker select,
+.arithmetic-trace-picker select,
+.arithmetic-step-controls button,
+.arithmetic-stages button {
+  border-color: var(--control-border);
+}
+.input-row input[aria-invalid='true'],
+.arithmetic-form input[aria-invalid='true'] {
+  border-color: var(--error);
+}
+.arithmetic-stages button[aria-current='step'] {
+  border-color: var(--accent);
+}
+.bit-button {
+  border-color: var(--field-color);
 }

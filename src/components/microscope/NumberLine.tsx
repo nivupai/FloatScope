@@ -117,9 +117,16 @@ export function NumberLine({
       <p id="line-keyboard-help" className="text-small muted">
         Focus the chart: Left/Right pan, +/− zoom, Up/Down move the binary64
         target by 1% of the view. Or use the buttons, target slider, and point
-        selector. Drag in the chosen mode.
+        selector. Drag in the chosen mode. On touch screens, use the controls to
+        avoid covering the plotted values; scroll the plot horizontally to see
+        its full width.
       </p>
-      <div className="microscope-chart-shell">
+      <div
+        className="microscope-chart-shell"
+        role="group"
+        aria-label="Scrollable number line plot"
+        tabIndex={0}
+      >
         <svg
           className="number-line-chart"
           viewBox="0 0 1000 235"
@@ -378,7 +385,12 @@ export function NumberLine({
           Visible point data ({points.length}
           {sampled ? ' sampled' : ''})
         </summary>
-        <div className="table-scroll">
+        <div
+          className="table-scroll"
+          role="group"
+          aria-label="Scrollable FP16 point table"
+          tabIndex={0}
+        >
           <table>
             <caption>
               Exact FP16 values actually rendered in the viewport; one encoding
