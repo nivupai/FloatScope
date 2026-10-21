@@ -49,7 +49,7 @@ All finite operands are integer multiples of `2^-24`. Even the largest sum has a
 | Finite nonzero discarded remainder | Inexact raised                                                                                                        |
 | Tiny after rounding AND inexact    | Underflow raised by definition; unreachable for valid FP16 add/sub operands                                           |
 
-NaN payload selection is a deterministic **FloatScope policy**, distinct from required NaN/invalid behavior. A selected NaN keeps its original sign even when it is operand B of subtraction. The quiet bit is fraction bit 9 and the payload is the low nine bits. Undefined infinity combinations use a canonical result because there is no input NaN to propagate.
+NaN payload selection is a deterministic **FP Play policy**, distinct from required NaN/invalid behavior. A selected NaN keeps its original sign even when it is operand B of subtraction. The quiet bit is fraction bit 9 and the payload is the low nine bits. Undefined infinity combinations use a canonical result because there is no input NaN to propagate.
 
 Subnormals are never flushed to zero. Tiny FP16 add/sub results are exact multiples of the subnormal quantum and need no rounding; therefore no valid input pair can raise underflow. Input conversion can underflow but is a separate operation whose flags are not exposed here. Overflow sets inexact even if the unbounded significand happened to need no discarded bits (for example, 65504 + 65504).
 
@@ -94,17 +94,17 @@ Reproduce with a C compiler and make (build directory may need adjustment on oth
 
 ```sh
 # Choose a temporary directory outside this repository.
-git clone https://github.com/ucb-bar/berkeley-softfloat-3.git /tmp/floatscope-softfloat
-cd /tmp/floatscope-softfloat
+git clone https://github.com/ucb-bar/berkeley-softfloat-3.git /tmp/fp-play-softfloat
+cd /tmp/fp-play-softfloat
 git checkout a0c6494cdc11865811dec815d5c0049fba9d82a8
 make -C build/Linux-x86_64-GCC -j2
 
-# Back in the FloatScope repository, after npm ci:
-cc -O2 -I/tmp/floatscope-softfloat/source/include \
+# Back in the FP Play repository, after npm ci:
+cc -O2 -I/tmp/fp-play-softfloat/source/include \
   scripts/softfloat-driver.c \
-  /tmp/floatscope-softfloat/build/Linux-x86_64-GCC/softfloat.a \
-  -o /tmp/floatscope-softfloat-driver
-node scripts/validate-softfloat.mjs /tmp/floatscope-softfloat-driver
+  /tmp/fp-play-softfloat/build/Linux-x86_64-GCC/softfloat.a \
+  -o /tmp/fp-play-softfloat-driver
+node scripts/validate-softfloat.mjs /tmp/fp-play-softfloat-driver
 ```
 
 The driver sets `softfloat_round_near_even` and `softfloat_tininess_afterRounding`, clears status before each operation, and reports raw output and flags. The JavaScript runner uses the existing TypeScript dependency to transpile the production engine into a cleaned temporary directory; no new dependency is required.

@@ -19,7 +19,7 @@ export default function App() {
           <div>
             <p className="eyebrow">IEEE 754 / BINARY16 / INTERACTIVE LAB</p>
             <h1>
-              FloatScope<span className="hero-dot">.</span>
+              FP Play<span className="hero-dot">.</span>
             </h1>
             <p className="hero-description">
               Small bits. Big implications. Explore how sixteen bits represent a
@@ -42,7 +42,7 @@ export default function App() {
         >
           <h2 id="about-heading">Precision should be understandable.</h2>
           <p className="muted">
-            FloatScope connects numerical representations to their consequences
+            FP Play connects numerical representations to their consequences
             through accessible, testable experiments. Explore IEEE 754
             representation, precision, and exact addition/subtraction traces. AI
             accelerator precision experiments are planned future work. All work
@@ -51,7 +51,7 @@ export default function App() {
         </section>
       </main>
       <footer className="site-footer">
-        FloatScope · Open source under the MIT License · Milestone 5
+        FP Play · Open source under the MIT License · Milestone 5
       </footer>
     </div>
   )

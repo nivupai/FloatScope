@@ -1,4 +1,4 @@
-// Optional development check. No SoftFloat source or binary is bundled with FloatScope.
+// Optional development check. No SoftFloat source or binary is bundled with FP Play.
 import { execFileSync } from 'node:child_process'
 import console from 'node:console'
 import process from 'node:process'
@@ -13,7 +13,7 @@ if (!driver)
   throw new Error(
     'Usage: node scripts/validate-softfloat.mjs /path/to/softfloat-driver',
   )
-const temporary = mkdtempSync(join(tmpdir(), 'floatscope-arithmetic-'))
+const temporary = mkdtempSync(join(tmpdir(), 'fp-play-arithmetic-'))
 try {
   for (const name of ['fp16', 'fp16Arithmetic']) {
     const source = readFileSync(
@@ -80,7 +80,7 @@ try {
       (result.flags.inexact ? 1 : 0)
     const isNaN = (expected & 0x7fff) > 0x7c00
     if (isNaN) nanResults += 1
-    // SoftFloat specialization payload/sign policy differs from FloatScope's policy.
+    // SoftFloat specialization payload/sign policy differs from FP Play's policy.
     // Still require a quiet NaN and identical invalid/overflow/underflow/inexact flags.
     const bitsMatch = isNaN
       ? result.decoded.classification === 'nan' && result.decoded.isQuietNaN

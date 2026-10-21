@@ -1,5 +1,5 @@
 {
-  "name": "floatscope",
+  "name": "fp-play",
   "private": true,
   "version": "0.1.0",
   "description": "An interactive laboratory for floating-point arithmetic and numerical precision.",

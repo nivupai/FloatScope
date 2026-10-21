@@ -1,7 +1,8 @@
-# FloatScope project conventions
+# FP Play project conventions
 
 ## Scope and architecture
 
+- Use **FP Play** as the public project name and `fp-play` as the npm package name and project-specific tool prefix. Preserve the original MIT copyright notice in `LICENSE`.
 - Build incrementally. Milestone 5 adds exact binary16 addition/subtraction and the Arithmetic Explorer. Preserve the representation Explorer and precision microscope. Multiplication, FMA, division, transformer attention, and hardware simulation remain future work.
 - Use React, strict TypeScript, Vite, Tailwind CSS, Vitest, ESLint, and Prettier. Prefer native platform APIs and keep dependencies minimal.
 - Put reusable UI in `src/components/`, pure numerical code in `src/lib/numerics/`, and tests in `src/tests/`. Keep numerical models independent of React, the DOM, and display formatting.
